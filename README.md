@@ -1,6 +1,6 @@
 # ObservaAção — Ouvidoria Cidadã Digital
 
-> Sistema de ouvidoria cidadã desenvolvido em Java 17 puro, sem frameworks externos.
+> Sistema de ouvidoria cidadã desenvolvido em Java 17 com Spring Boot, expondo uma API REST.
 
 **AEP — Análise e Desenvolvimento de Sistemas · 1º Semestre 2026**  
 Disciplinas: Interação Humano-Computador · Programação Orientada a Objetos · Manutenção de Software  
@@ -18,6 +18,7 @@ ODS relacionados: [ODS 10](https://brasil.un.org/pt-br/sdgs/10) · [ODS 11](http
 - [Princípios Aplicados](#princípios-aplicados)
 - [Stack Tecnológica](#stack-tecnológica)
 - [Como Executar](#como-executar)
+- [API Endpoints](#api-endpoints)
 - [Estrutura de Arquivos](#estrutura-de-arquivos)
 - [Entregas](#entregas)
 
@@ -86,16 +87,17 @@ O objetivo não é "fazer um app bonito", mas reduzir barreiras, aumentar transp
 
 ## Arquitetura e Organização
 
-O sistema segue uma **arquitetura em camadas** definida manualmente, sem frameworks, garantindo separação de responsabilidades e baixo acoplamento:
+O sistema segue uma **arquitetura em camadas** com Spring Boot, garantindo separação de responsabilidades e baixo acoplamento:
 
 ```
 ┌─────────────────────────────────────────────┐
-│                   Menu (CLI)                │  ← Apresentação: lê entrada, exibe saída
+│         Controllers (REST API)              │  ← Apresentação: recebe HTTP, devolve JSON
+│   CidadaoController │ GestorController      │
 ├─────────────────────────────────────────────┤
 │              SolicitacaoService             │  ← Regras de negócio: validação, SLA, protocolo
 ├─────────────────────────────────────────────┤
 │          SolicitacaoRepository (interface)  │  ← Contrato de acesso a dados
-│       SolicitacaoRepositoryEmMemoria        │  ← Implementação: HashMap em memória (1º bim.)
+│       SolicitacaoRepositoryEmMemoria        │  ← Implementação: ConcurrentHashMap em memória
 ├─────────────────────────────────────────────┤
 │         Domain: Solicitacao (abstrata)      │
 │   SolicitacaoIdentificada │ SolicitacaoAnonima │  ← Modelo de domínio
@@ -121,20 +123,20 @@ Cada `Solicitacao` mantém uma lista imutável de `Movimentacao`, registrando o 
 
 | Princípio | Onde foi aplicado |
 |---|---|
-| **SRP** — Responsabilidade Única | `Formatador` só formata; `Validador` só valida; `GeradorProtocolo` só gera protocolos; `Menu` só gerencia a UI |
+| **SRP** — Responsabilidade Única | `Validador` só valida; `GeradorProtocolo` só gera protocolos; controllers só orquestram HTTP |
 | **OCP** — Aberto/Fechado | `Status`: cada constante do enum encapsula sua própria regra de transição — adicionar um novo status não exige modificar código existente |
-| **LSP** — Substituição de Liskov | `getDadosComplementares()` abstrato em `Solicitacao`; cada subclasse implementa sem surpresas — `Formatador` nunca precisa de cast |
+| **LSP** — Substituição de Liskov | `getDadosComplementares()` abstrato em `Solicitacao`; cada subclasse implementa sem surpresas |
 | **ISP** — Segregação de Interfaces | `SolicitacaoRepository` expõe apenas os métodos necessários, sem sobrecarregar os consumidores |
-| **DIP** — Inversão de Dependência | `SolicitacaoService` depende da interface `SolicitacaoRepository`, não da implementação concreta; `Main` injeta `SolicitacaoRepositoryEmMemoria` |
+| **DIP** — Inversão de Dependência | `SolicitacaoService` depende da interface `SolicitacaoRepository`; injeção via construtor em todas as camadas |
 
 ### Clean Code
 
 | Prática | Onde foi aplicado |
 |---|---|
-| Nomes que revelam intenção | Variáveis de loop `s`/`m` renomeadas para `solicitacao`/`movimentacao`; método `processarOpcaoPrincipal` no lugar de `exibirMenuPrincipal` |
-| Sem comentários redundantes | Removido `// --- Getters ---` — o nome do método já comunica |
-| Sem magic numbers | `LARGURA_LINHA = 60` em vez de `"─".repeat(60)` direto no código |
-| Funções fazem uma coisa | `imprimirSolicitacaoDetalhada` decomposto em `imprimirDadosPrincipais`, `imprimirDadosComplementares` e `imprimirHistorico` |
+| Nomes que revelam intenção | DTOs com nomes completos: `SolicitacaoIdentificadaRequest`, `SolicitacaoDetalhadaResponse` |
+| Sem comentários redundantes | Nomes de métodos e classes comunicam a intenção sem comentários auxiliares |
+| Sem magic numbers | Constantes nomeadas para SLAs (`DIAS_SLA_BAIXA = 7`) e limites de validação |
+| Funções fazem uma coisa | Cada método do service executa uma responsabilidade isolada |
 | DRY | `filtrar(Predicate<Solicitacao>)` elimina triplicação dos métodos de filtro no repositório |
 
 ---
@@ -143,11 +145,11 @@ Cada `Solicitacao` mantém uma lista imutável de `Movimentacao`, registrando o 
 
 | Camada | Tecnologia | Justificativa |
 |---|---|---|
-| Linguagem | Java 17 (sem frameworks) | Exigência da disciplina — aplica POO diretamente |
-| Interface | CLI (linha de comando) | Sem dependência de bibliotecas externas |
-| Persistência (1º bim.) | Em memória — `HashMap` | Coleções nativas do Java; sem banco ou ORM |
-| Persistência (2º bim.) | Arquivos `.txt` / `.csv` | `java.io` nativo, sem libs externas |
-| Compilação | `javac` / `java` (JDK padrão) | Sem Maven, Gradle ou build tools externos |
+| Linguagem | Java 17 | LTS estável, records, sealed classes |
+| Framework | Spring Boot 3 | Convenção sobre configuração, ecossistema maduro |
+| API | Spring Web (REST) | Exposição via HTTP/JSON |
+| Persistência | Em memória — `ConcurrentHashMap` | Sem banco de dados; repositório substituível via interface |
+| Build | Maven (Maven Wrapper) | Reprodutibilidade sem instalação prévia |
 | Controle de versão | Git + GitHub | — |
 
 ---
@@ -157,86 +159,74 @@ Cada `Solicitacao` mantém uma lista imutável de `Movimentacao`, registrando o 
 ### Pré-requisito
 
 - **JDK 17** instalado ([download Adoptium](https://adoptium.net/))
-- `java` e `javac` disponíveis no PATH
+- `java` disponível no PATH (Maven Wrapper baixa o Maven automaticamente)
 
 Para verificar:
 ```bash
 java -version
-javac -version
 ```
-
-Ambos devem retornar versão 17 ou superior.
 
 ---
 
 ### Windows
 
-**1. Compilar:**
 ```bat
-compile.bat
+mvnw.cmd spring-boot:run
 ```
-
-**2. Executar:**
-```bat
-run.bat
-```
-
-> Os scripts já criam a pasta `out/` automaticamente se ela não existir.
-
----
 
 ### Linux / macOS
 
-**1. Compilar:**
 ```bash
-find src -name "*.java" > sources.txt
-javac -encoding UTF-8 -d out @sources.txt
+./mvnw spring-boot:run
 ```
 
-**2. Executar:**
-```bash
-java -cp out -Dfile.encoding=UTF-8 observaacao.Main
-```
+A aplicação sobe na porta **8080**.
 
 ---
 
-### Passo a passo manual (qualquer sistema)
+### Passo a passo completo
 
 ```bash
 # 1. Clone o repositório
 git clone https://github.com/Leocm123/aep-observaacao.git
 cd aep-observaacao
 
-# 2. Crie a pasta de saída
-mkdir out
-
-# 3. Liste os fontes e compile
-find src -name "*.java" > sources.txt
-javac -encoding UTF-8 -d out @sources.txt
-
-# 4. Execute
-java -cp out -Dfile.encoding=UTF-8 observaacao.Main
+# 2. Suba a aplicação
+./mvnw spring-boot:run        # Linux/macOS
+mvnw.cmd spring-boot:run      # Windows
 ```
+
+Acesse `http://localhost:8080/api/cidadao/solicitacoes` para confirmar que a API está no ar.
 
 ---
 
-### Navegação no sistema
+## API Endpoints
 
-Ao iniciar, o sistema exibe o menu principal:
+### Cidadão — `/api/cidadao`
 
-```
-========================================
-   ObservaAção — Ouvidoria Cidadã Digital
-========================================
+| Método | Endpoint | Body | Resposta |
+|--------|----------|------|----------|
+| `POST` | `/api/cidadao/solicitacoes/identificada` | `SolicitacaoIdentificadaRequest` | `SolicitacaoDetalhadaResponse` — 201 |
+| `POST` | `/api/cidadao/solicitacoes/anonima` | `SolicitacaoAnonimaRequest` | `SolicitacaoDetalhadaResponse` — 201 |
+| `GET` | `/api/cidadao/solicitacoes/{protocolo}` | — | `SolicitacaoDetalhadaResponse` — 200 ou 404 |
 
-Acesse como:
-  1. Cidadão
-  2. Atendente / Gestor
-  0. Sair
-```
+### Gestor — `/api/gestor`
 
-- **Opção 1 (Cidadão):** registrar nova solicitação ou consultar protocolo existente
-- **Opção 2 (Atendente/Gestor):** listar, filtrar e atualizar demandas
+| Método | Endpoint | Params | Resposta |
+|--------|----------|--------|----------|
+| `GET` | `/api/gestor/solicitacoes` | `?status=`, `?categoria=`, `?prioridade=` (opcionais) | `List<SolicitacaoResumoResponse>` — 200 |
+| `GET` | `/api/gestor/solicitacoes/{protocolo}` | — | `SolicitacaoDetalhadaResponse` — 200 ou 404 |
+| `PATCH` | `/api/gestor/solicitacoes/{protocolo}/status` | — | `SolicitacaoDetalhadaResponse` — 200, 404 ou 422 |
+
+### Códigos de resposta
+
+| Código | Situação |
+|--------|----------|
+| 201 | Solicitação criada com sucesso |
+| 200 | Consulta ou atualização bem-sucedida |
+| 400 | Dados de entrada inválidos (`ValidacaoException`) |
+| 404 | Protocolo não encontrado (`SolicitacaoNaoEncontradaException`) |
+| 422 | Transição de status inválida (`TransicaoStatusInvalidaException`) |
 
 ---
 
@@ -245,34 +235,51 @@ Acesse como:
 ```
 aep-observaacao/
 ├── src/
-│   └── observaacao/
-│       ├── Main.java                              # Ponto de entrada e injeção de dependências
-│       ├── menu/
-│       │   └── Menu.java                          # Interface CLI e fluxos de navegação
-│       ├── service/
-│       │   └── SolicitacaoService.java            # Lógica de negócio central
-│       ├── repository/
-│       │   ├── SolicitacaoRepository.java         # Interface de acesso a dados (DIP)
-│       │   └── SolicitacaoRepositoryEmMemoria.java # Implementação em HashMap
-│       ├── domain/
-│       │   ├── model/
-│       │   │   ├── Solicitacao.java               # Classe abstrata base
-│       │   │   ├── SolicitacaoIdentificada.java   # Com dados do cidadão
-│       │   │   ├── SolicitacaoAnonima.java        # Sem dados pessoais
-│       │   │   └── Movimentacao.java              # Registro imutável de histórico
-│       │   └── enums/
-│       │       ├── Status.java                    # Fluxo de estados com OCP
-│       │       ├── Categoria.java                 # Tipos de problema urbano
-│       │       └── Prioridade.java                # Níveis de SLA (Verde/Amarelo/Vermelho)
-│       └── util/
-│           ├── GeradorProtocolo.java              # Formato OBS-AAAA-NNNNN (AtomicInteger)
-│           ├── Validador.java                     # Validações de entrada do usuário
-│           └── Formatador.java                    # Formatação de saída no terminal
+│   └── main/
+│       ├── java/
+│       │   └── br/com/observaacao/
+│       │       ├── ObservacaoApplication.java         # Ponto de entrada Spring Boot
+│       │       ├── controller/
+│       │       │   ├── CidadaoController.java         # Endpoints do cidadão
+│       │       │   └── GestorController.java          # Endpoints do gestor
+│       │       ├── service/
+│       │       │   └── SolicitacaoService.java        # Lógica de negócio central
+│       │       ├── repository/
+│       │       │   ├── SolicitacaoRepository.java     # Interface de acesso a dados (DIP)
+│       │       │   └── SolicitacaoRepositoryEmMemoria.java  # Implementação ConcurrentHashMap
+│       │       ├── domain/
+│       │       │   ├── model/
+│       │       │   │   ├── Solicitacao.java           # Classe abstrata base
+│       │       │   │   ├── SolicitacaoIdentificada.java  # Com dados do cidadão
+│       │       │   │   ├── SolicitacaoAnonima.java    # Sem dados pessoais
+│       │       │   │   └── Movimentacao.java          # Registro imutável de histórico
+│       │       │   └── enums/
+│       │       │       ├── Status.java                # Fluxo de estados com OCP
+│       │       │       ├── Categoria.java             # Tipos de problema urbano
+│       │       │       └── Prioridade.java            # Níveis de SLA
+│       │       ├── dto/
+│       │       │   ├── SolicitacaoIdentificadaRequest.java
+│       │       │   ├── SolicitacaoAnonimaRequest.java
+│       │       │   ├── AtualizacaoStatusRequest.java
+│       │       │   ├── SolicitacaoResumoResponse.java
+│       │       │   ├── SolicitacaoDetalhadaResponse.java
+│       │       │   └── MovimentacaoResponse.java
+│       │       ├── exception/
+│       │       │   ├── GlobalExceptionHandler.java    # @RestControllerAdvice centralizado
+│       │       │   ├── SolicitacaoNaoEncontradaException.java
+│       │       │   ├── TransicaoStatusInvalidaException.java
+│       │       │   └── ValidacaoException.java
+│       │       └── util/
+│       │           ├── GeradorProtocolo.java          # Formato OBS-AAAA-NNNNN
+│       │           └── Validador.java                 # Validações de entrada
+│       └── resources/
+│           └── application.properties
 ├── docs/
-│   ├── perfis_e_personas.docx                    # Perfis e personas (entrega IHC)
-│   └── relatorio_clean_code.docx                 # Relatório Clean Code 3 funções
-├── compile.bat                                    # Script de compilação (Windows)
-├── run.bat                                        # Script de execução (Windows)
+│   ├── perfil-persona-aep.pdf                        # Perfis e personas (entrega IHC)
+│   └── relatorio_clean_code.pdf                      # Relatório Clean Code
+├── pom.xml
+├── mvnw
+├── mvnw.cmd
 └── README.md
 ```
 
@@ -283,13 +290,12 @@ aep-observaacao/
 ### 1º Bimestre ✅
 
 - ✅ Versão Beta funcional em CLI (Java 17, sem framework)
-- ✅ Perfis e personas (IHC) — `docs/perfis_e_personas.docx`
-- ✅ Relatório Clean Code (3 funções) — `docs/relatorio_clean_code.docx`
-- ⏳ Vídeo de apresentação (até 5 min)
+- ✅ Perfis e personas (IHC) — `docs/perfil-persona-aep.pdf`
+- ✅ Relatório Clean Code (3 funções) — `docs/relatorio_clean_code.pdf`
 
 ### 2º Bimestre
 
+- ✅ Migração para Spring Boot (controller / service / repository / DTOs)
 - ⬜ Wireframes de todas as telas (IHC)
-- ⬜ Migração para Spring Boot (controller / service / repository)
-- ⬜ Persistência em arquivo `.txt` / `.csv` ou banco de dados
+- ⬜ Persistência em arquivo ou banco de dados
 - ⬜ Relatório de métricas (SonarQube / Checkstyle / PMD)

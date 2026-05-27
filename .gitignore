@@ -1,13 +1,16 @@
-# Compiled output
-out/
+# Maven build output
+target/
 *.class
+
+# Maven wrapper cache (baixado automaticamente)
+.m2/
 
 # IntelliJ IDEA
 .idea/
 *.iml
 
-# Build artifacts
-sources.txt
+# VS Code
+.vscode/
 
 # Claude Code (local settings)
 .claude/

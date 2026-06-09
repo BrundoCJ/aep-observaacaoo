@@ -285,6 +285,30 @@ aep-observaacao/
 
 ---
 
+
+## Frontend
+
+O sistema conta com um frontend completo em HTML/CSS/JS puro, sem dependências externas,
+servido diretamente pelo Spring Boot como recurso estático.
+
+### Como acessar
+
+1. Suba a aplicação: `./mvnw spring-boot:run`
+2. Acesse: `http://localhost:8080/`
+
+### Telas disponíveis
+
+| Tela | Rota | API |
+|------|------|-----|
+| Seleção de Perfil | `/` | — |
+| Registrar Solicitação | Cidadão | `POST /api/cidadao/solicitacoes/{identificada\|anonima}` |
+| Confirmação de Registro | Cidadão | Response 201 |
+| Consultar por Protocolo | Cidadão | `GET /api/cidadao/solicitacoes/{protocolo}` |
+| Lista de Solicitações | Atendente | `GET /api/gestor/solicitacoes` |
+| Detalhe + Atualizar Status | Atendente | `GET` + `PATCH /api/gestor/solicitacoes/{protocolo}/status` |
+
+---
+
 ## Entregas
 
 ### 1º Bimestre ✅
@@ -296,6 +320,7 @@ aep-observaacao/
 ### 2º Bimestre
 
 - ✅ Migração para Spring Boot (controller / service / repository / DTOs)
-- ⬜ Wireframes de todas as telas (IHC)
+- ✅ Wireframes das telas essenciais (IHC) — 6 telas mapeadas aos endpoints da API
+- ✅ Frontend completo integrado — `src/main/resources/static/index.html`
 - ⬜ Persistência em arquivo ou banco de dados
 - ⬜ Relatório de métricas (SonarQube / Checkstyle / PMD)

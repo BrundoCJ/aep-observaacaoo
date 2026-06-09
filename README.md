@@ -20,6 +20,7 @@ ODS relacionados: [ODS 10](https://brasil.un.org/pt-br/sdgs/10) · [ODS 11](http
 - [Como Executar](#como-executar)
 - [API Endpoints](#api-endpoints)
 - [Estrutura de Arquivos](#estrutura-de-arquivos)
+- [Frontend](#frontend)
 - [Entregas](#entregas)
 
 ---
@@ -125,7 +126,7 @@ Cada `Solicitacao` mantém uma lista imutável de `Movimentacao`, registrando o 
 |---|---|
 | **SRP** — Responsabilidade Única | `Validador` só valida; `GeradorProtocolo` só gera protocolos; controllers só orquestram HTTP |
 | **OCP** — Aberto/Fechado | `Status`: cada constante do enum encapsula sua própria regra de transição — adicionar um novo status não exige modificar código existente |
-| **LSP** — Substituição de Liskov | `getDadosComplementares()` abstrato em `Solicitacao`; cada subclasse implementa sem surpresas |
+| **LSP** — Substituição de Liskov | `isAnonima()` abstrato em `Solicitacao`; `SolicitacaoIdentificada` retorna `false`, `SolicitacaoAnonima` retorna `true` — subclasses substituíveis sem surpresas |
 | **ISP** — Segregação de Interfaces | `SolicitacaoRepository` expõe apenas os métodos necessários, sem sobrecarregar os consumidores |
 | **DIP** — Inversão de Dependência | `SolicitacaoService` depende da interface `SolicitacaoRepository`; injeção via construtor em todas as camadas |
 
@@ -196,7 +197,7 @@ cd aep-observaacao
 mvnw.cmd spring-boot:run      # Windows
 ```
 
-Acesse `http://localhost:8080/api/cidadao/solicitacoes` para confirmar que a API está no ar.
+Acesse `http://localhost:8080/` para abrir o frontend, ou `http://localhost:8080/api/gestor/solicitacoes` para confirmar que a API está no ar.
 
 ---
 
@@ -273,6 +274,8 @@ aep-observaacao/
 │       │           ├── GeradorProtocolo.java          # Formato OBS-AAAA-NNNNN
 │       │           └── Validador.java                 # Validações de entrada
 │       └── resources/
+│           ├── static/
+│           │   └── index.html                        # Frontend — SPA completo
 │           └── application.properties
 ├── docs/
 │   ├── perfil-persona-aep.pdf                        # Perfis e personas (entrega IHC)

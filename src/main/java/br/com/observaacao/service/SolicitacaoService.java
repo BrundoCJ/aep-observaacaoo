@@ -99,19 +99,10 @@ public class SolicitacaoService {
     }
 
     public List<SolicitacaoResumoResponse> listarComFiltros(Status status, Categoria categoria, Prioridade prioridade) {
-        List<Solicitacao> solicitacoes;
-
-        if (status != null) {
-            solicitacoes = repository.listarPorStatus(status);
-        } else if (categoria != null) {
-            solicitacoes = repository.listarPorCategoria(categoria);
-        } else if (prioridade != null) {
-            solicitacoes = repository.listarPorPrioridade(prioridade);
-        } else {
-            solicitacoes = repository.listarTodas();
-        }
-
-        return solicitacoes.stream()
+        return repository.listarTodas().stream()
+            .filter(s -> status     == null || s.getStatus()     == status)
+            .filter(s -> categoria  == null || s.getCategoria()  == categoria)
+            .filter(s -> prioridade == null || s.getPrioridade() == prioridade)
             .map(this::construirRespostaResumo)
             .toList();
     }

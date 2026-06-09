@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ObservaAção — Ouvidoria Cidadã Digital</title>
+<style>
+/* ── Reset & Tokens ────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:         #F0F4FB;
+  --card:       #FFFFFF;
+  --primary:    #2563EB;
+  --primary-dk: #1D4ED8;
+  --primary-lt: #EFF6FF;
+  --success:    #059669;
+  --success-lt: #ECFDF5;
+  --warn:       #D97706;
+  --warn-lt:    #FFFBEB;
+  --danger:     #DC2626;
+  --danger-lt:  #FEF2F2;
+  --gray-50:    #F9FAFB;
+  --gray-100:   #F3F4F6;
+  --gray-200:   #E5E7EB;
+  --gray-400:   #9CA3AF;
+  --gray-500:   #6B7280;
+  --gray-600:   #4B5563;
+  --gray-700:   #374151;
+  --gray-900:   #111827;
+  --text:       #1A2332;
+  --text-2:     #4B5563;
+  --text-3:     #9CA3AF;
+  --border:     #E5E7EB;
+  --radius:     16px;
+  --radius-sm:  10px;
+  --shadow:     0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-md:  0 4px 12px rgba(0,0,0,.1), 0 1px 4px rgba(0,0,0,.06);
+  --font:       -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --mono:       'SF Mono', 'Fira Code', 'Courier New', monospace;
+  --trans:      .18s ease;
+}
+
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+/* ── Screens ─────────────────────────────────────── */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: flex; flex-direction: column; }
+.screen.desk-screen.active { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+/* ── Citizen wrapper (max-width, centered) ────────── */
+.citizen-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 16px 40px; }
+.citizen-form  { width: 100%; max-width: 480px; }
+
+/* ── Citizen header ───────────────────────────────── */
+.cit-header {
+  background: var(--card); border-bottom: 1px solid var(--border);
+  padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 10; width: 100%;
+}
+.cit-header-inner { width: 100%; max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.back-btn {
+  width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text-2); transition: var(--trans); flex-shrink: 0;
+}
+.back-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
+.header-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.header-logo-sm { font-size: 20px; }
+
+/* ── Cards ───────────────────────────────────────── */
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
+.card-flat { background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border); padding: 20px; margin-bottom: 16px; }
+.card-accent { background: var(--primary-lt); border-radius: var(--radius); border: 1.5px solid #BFDBFE; padding: 20px; margin-bottom: 16px; }
+
+/* ── Forms ───────────────────────────────────────── */
+.form-section { margin: 20px 0 0; }
+.form-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-3); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.form-group .hint { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+.form-group .error { font-size: 12px; color: var(--danger); margin-top: 4px; display: none; }
+.form-group.has-error input, .form-group.has-error select, .form-group.has-error textarea { border-color: var(--danger); }
+.form-group.has-error .error { display: block; }
+input, select, textarea {
+  width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 15px; font-family: var(--font); color: var(--text); background: var(--card);
+  transition: border-color var(--trans), box-shadow var(--trans); outline: none;
+  -webkit-appearance: none;
+}
+input::placeholder, textarea::placeholder { color: var(--text-3); }
+input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+textarea { min-height: 90px; resize: vertical; }
+
+/* ── Tipo Toggle ─────────────────────────────────── */
+.tipo-toggle { display: flex; background: var(--gray-100); border-radius: 12px; padding: 4px; margin-bottom: 20px; gap: 4px; }
+.tipo-btn {
+  flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer;
+  font-size: 14px; font-weight: 600; font-family: var(--font);
+  background: transparent; color: var(--text-2); transition: var(--trans);
+}
+.tipo-btn.active { background: var(--card); color: var(--primary); box-shadow: var(--shadow); }
+
+/* ── Category grid ───────────────────────────────── */
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+.cat-btn {
+  border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 8px;
+  background: var(--card); cursor: pointer; text-align: center; transition: var(--trans);
+}
+.cat-btn .cat-emoji { font-size: 22px; display: block; margin-bottom: 5px; }
+.cat-btn .cat-label { font-size: 11px; font-weight: 600; color: var(--text-2); }
+.cat-btn:hover { border-color: var(--primary); background: var(--primary-lt); }
+.cat-btn.selected { border-color: var(--primary); background: var(--primary-lt); }
+.cat-btn.selected .cat-label { color: var(--primary); }
+
+/* ── Prioridade Pills ─────────────────────────────── */
+.prio-row { display: flex; gap: 8px; }
+.prio-btn {
+  flex: 1; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 8px;
+  background: var(--card); cursor: pointer; text-align: center; transition: var(--trans); font-family: var(--font);
+}
+.prio-btn span:first-child { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.prio-btn span:last-child { font-size: 12px; color: var(--text-3); }
+.prio-btn.selected { border-color: var(--primary); background: var(--primary-lt); }
+.prio-btn.selected span:first-child { color: var(--primary); }
+
+/* ── Buttons ─────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 24px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: var(--trans); border: none;
+  text-decoration: none; width: 100%;
+}
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dk); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.35); }
+.btn-secondary { background: var(--card); color: var(--primary); border: 1.5px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-lt); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn:disabled { opacity: .55; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+.btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
+.btn-copy { background: var(--gray-100); color: var(--text-2); border: 1.5px solid var(--border); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--trans); display: inline-flex; align-items: center; gap: 6px; }
+.btn-copy:hover { background: var(--gray-200); }
+
+/* ── Badges / Status / SLA ───────────────────────── */
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
+.badge-aberto      { background: #DBEAFE; color: #1D4ED8; }
+.badge-triagem     { background: #FEF3C7; color: #92400E; }
+.badge-execucao    { background: #EDE9FE; color: #5B21B6; }
+.badge-resolvido   { background: var(--success-lt); color: #065F46; }
+.badge-encerrado   { background: var(--gray-100); color: var(--gray-600); }
+.badge-alta        { background: #FEE2E2; color: #991B1B; }
+.badge-media       { background: #FEF3C7; color: #92400E; }
+.badge-baixa       { background: #DCFCE7; color: #14532D; }
+.sla-verde   { color: var(--success); font-weight: 700; font-size: 13px; }
+.sla-amarelo { color: var(--warn);    font-weight: 700; font-size: 13px; }
+.sla-vencido { color: var(--danger);  font-weight: 700; font-size: 13px; }
+
+/* ── Timeline ────────────────────────────────────── */
+.timeline { position: relative; }
+.tl-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
+.tl-item:last-child { padding-bottom: 0; }
+.tl-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gray-300, #D1D5DB); border: 2px solid var(--card); box-shadow: 0 0 0 2px var(--gray-400); margin-top: 4px; }
+.tl-dot.current { background: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+.tl-line { width: 2px; background: var(--gray-200); flex: 1; min-height: 24px; margin: 4px 0; }
+.tl-body { flex: 1; }
+.tl-meta { font-size: 12px; color: var(--text-3); margin-bottom: 3px; }
+.tl-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.tl-comment { background: var(--gray-50); border-left: 3px solid var(--border); padding: 8px 10px; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--text-2); font-style: italic; margin-top: 5px; }
+.tl-resp { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+
+/* ── Protocol Ticket ─────────────────────────────── */
+.protocol-ticket {
+  background: var(--gray-900); color: #fff; border-radius: var(--radius);
+  padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden;
+}
+.protocol-ticket::after {
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 40px;
+  background: repeating-linear-gradient(to bottom, transparent, transparent 12px, rgba(255,255,255,.15) 12px, rgba(255,255,255,.15) 13px);
+}
+.ticket-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #9CA3AF; margin-bottom: 8px; }
+.ticket-number { font-family: var(--mono); font-size: 26px; font-weight: 700; letter-spacing: 2px; margin-bottom: 16px; }
+.ticket-row { display: flex; justify-content: space-between; align-items: center; }
+.ticket-actions { display: flex; gap: 8px; }
+
+/* ── KV rows ─────────────────────────────────────── */
+.kv { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
+.kv:last-child { border-bottom: none; }
+.kv-label { font-size: 13px; color: var(--text-2); }
+.kv-value { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; }
+
+/* ── Sidebar & Desk Layout ───────────────────────── */
+.sidebar { background: var(--gray-900); min-height: 100vh; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.sidebar-logo .logo-icon { font-size: 28px; margin-bottom: 4px; }
+.sidebar-logo .logo-name { font-size: 15px; font-weight: 700; color: #fff; }
+.sidebar-logo .logo-sub { font-size: 11px; color: #6B7280; }
+.sidebar-nav { padding: 12px 0; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 20px;
+  color: #9CA3AF; text-decoration: none; font-size: 14px; font-weight: 500;
+  cursor: pointer; border: none; background: none; width: 100%;
+  transition: color var(--trans), background var(--trans);
+}
+.nav-item:hover { color: #fff; background: rgba(255,255,255,.05); }
+.nav-item.active { color: #fff; background: rgba(37,99,235,.3); border-left: 3px solid var(--primary); }
+.nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; }
+.sidebar-user { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); }
+.sidebar-user .user-name { font-size: 13px; font-weight: 600; color: #E5E7EB; }
+.sidebar-user .user-role { font-size: 11px; color: #6B7280; }
+.btn-logout { background: none; border: 1px solid rgba(255,255,255,.12); color: #9CA3AF; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px; width: 100%; transition: var(--trans); }
+.btn-logout:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+
+/* ── Desk Main ───────────────────────────────────── */
+.desk-main { display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; }
+.desk-topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+.desk-topbar h1 { font-size: 18px; font-weight: 700; }
+.desk-topbar .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.desk-content { padding: 28px; flex: 1; overflow-y: auto; }
+
+/* ── Filter bar ─────────────────────────────────── */
+.filter-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-label { font-size: 12px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin-right: 4px; }
+.filter-chip {
+  padding: 6px 12px; border-radius: 99px; border: 1.5px solid var(--border);
+  background: var(--card); font-size: 13px; font-weight: 500; color: var(--text-2);
+  cursor: pointer; transition: var(--trans);
+}
+.filter-chip:hover { border-color: var(--primary); color: var(--primary); }
+.filter-chip.active { border-color: var(--primary); background: var(--primary-lt); color: var(--primary); }
+
+/* ── List cards (T05) ────────────────────────────── */
+.request-list { display: flex; flex-direction: column; gap: 8px; }
+.request-item {
+  background: var(--card); border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+  padding: 14px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: var(--trans);
+}
+.request-item:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+.request-item.vencido { border-left: 4px solid var(--danger); }
+.request-item .item-proto { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); width: 140px; flex-shrink: 0; }
+.request-item .item-main { flex: 1; min-width: 0; }
+.request-item .item-cat { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.request-item .item-loc { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.request-item .item-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.request-item .item-sla { text-align: right; flex-shrink: 0; }
+.item-date { font-size: 12px; color: var(--text-3); margin-bottom: 4px; }
+
+/* ── Detail two-col ──────────────────────────────── */
+.detail-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+
+/* ── Search result ───────────────────────────────── */
+#consulta-resultado { display: none; }
+.status-hero { background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; border: 1.5px solid var(--border); }
+
+/* ── Empty / Error states ────────────────────────── */
+.empty-state { text-align: center; padding: 48px 24px; color: var(--text-3); }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state p { font-size: 16px; }
+
+/* ── Toast ───────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--gray-900); color: #fff; padding: 13px 20px; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500; z-index: 999; transition: transform .3s ease;
+  display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-md); min-width: 280px;
+  pointer-events: none;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+#toast.toast-success { background: #065F46; }
+#toast.toast-error   { background: #7F1D1D; }
+#toast.toast-info    { background: #1E3A5F; }
+
+/* ── Loading overlay ─────────────────────────────── */
+#loading {
+  position: fixed; inset: 0; background: rgba(255,255,255,.7); z-index: 998;
+  display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+}
+#loading.show { display: flex; }
+.spinner { width: 42px; height: 42px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── T01: Seleção de Perfil ──────────────────────── */
+#screen-perfil {
+  background: linear-gradient(160deg, #EFF6FF 0%, #F0FDF4 50%, #F5F3FF 100%);
+  align-items: center; justify-content: center; flex-direction: column;
+  padding: 40px 20px;
+}
+.perfil-header { text-align: center; margin-bottom: 40px; }
+.perfil-header .logo { font-size: 52px; margin-bottom: 12px; }
+.perfil-header h1 { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 6px; letter-spacing: -.5px; }
+.perfil-header p { font-size: 16px; color: var(--text-2); max-width: 360px; line-height: 1.5; }
+.perfil-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 580px; width: 100%; }
+.perfil-card {
+  background: var(--card); border-radius: 20px; padding: 32px 24px; text-align: center;
+  cursor: pointer; transition: var(--trans); border: 2px solid transparent;
+  box-shadow: var(--shadow);
+}
+.perfil-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.perfil-card.cidadao:hover { border-color: var(--primary); }
+.perfil-card.atendente:hover { border-color: #6D28D9; }
+.perfil-card .pc-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+.perfil-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+.perfil-card p { font-size: 13px; color: var(--text-2); margin-bottom: 20px; line-height: 1.5; }
+.perfil-card .pc-btn {
+  display: block; padding: 11px 20px; border-radius: var(--radius-sm); font-weight: 700;
+  font-size: 14px; font-family: var(--font);
+  border: none; cursor: pointer; transition: var(--trans); width: 100%;
+}
+.cidadao .pc-btn   { background: var(--primary); color: #fff; }
+.atendente .pc-btn { background: #6D28D9; color: #fff; }
+.perfil-footer { text-align: center; margin-top: 32px; font-size: 13px; color: var(--text-3); }
+
+/* ── T03: Confirmação extras ─────────────────────── */
+.confim-top { text-align: center; padding: 32px 0 20px; }
+.confirm-check { font-size: 56px; margin-bottom: 12px; display: block; }
+.confirm-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.confirm-sub { font-size: 15px; color: var(--text-2); }
+.anon-notice { background: var(--success-lt); border-radius: var(--radius-sm); padding: 12px 14px; border: 1px solid #A7F3D0; margin-bottom: 16px; font-size: 13px; color: #065F46; display: flex; gap: 8px; align-items: flex-start; }
+
+/* ── Search input container ──────────────────────── */
+.search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-box input { flex: 1; font-family: var(--mono); text-transform: uppercase; font-size: 16px; letter-spacing: 1px; }
+.search-box .btn { width: auto; flex-shrink: 0; padding: 11px 20px; }
+
+/* ── Update form card ────────────────────────────── */
+.update-card { background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border); padding: 24px; position: sticky; top: 80px; }
+.update-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
+.response-codes { background: var(--gray-50); border-radius: 8px; padding: 12px; margin-top: 16px; }
+.response-codes p { font-size: 12px; color: var(--text-3); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
+.rc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 13px; color: var(--text-2); }
+.rc-code { font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.rc-200 { background: var(--success-lt); color: var(--success); }
+.rc-400, .rc-422 { background: var(--warn-lt); color: var(--warn); }
+.rc-404 { background: var(--danger-lt); color: var(--danger); }
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 900px) {
+  .screen.desk-screen.active { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .update-card { position: static; margin-top: 20px; }
+}
+@media (max-width: 520px) {
+  .perfil-cards { grid-template-columns: 1fr; }
+  .perfil-header h1 { font-size: 22px; }
+  .request-item .item-proto { width: 110px; font-size: 11px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ────────────── LOADING ────────────── -->
+<div id="loading"><div class="spinner"></div></div>
+
+<!-- ────────────── TOAST ─────────────── -->
+<div id="toast"></div>
+
+
+<!-- ═══════════════════════════════════════════════
+     T01 — SELEÇÃO DE PERFIL
+═══════════════════════════════════════════════ -->
+<div id="screen-perfil" class="screen active">
+  <div class="perfil-header">
+    <div class="logo">🏛️</div>
+    <h1>ObservaAção</h1>
+    <p>Ouvidoria Cidadã Digital — Registre e acompanhe solicitações de serviços públicos</p>
+  </div>
+
+  <div class="perfil-cards">
+    <div class="perfil-card cidadao" onclick="startCidadao()">
+      <span class="pc-icon">👤</span>
+      <h2>Sou Cidadão</h2>
+      <p>Registre uma solicitação ou consulte o andamento pelo protocolo</p>
+      <button class="pc-btn">Acessar</button>
+    </div>
+    <div class="perfil-card atendente" onclick="startAtendente()">
+      <span class="pc-icon">👔</span>
+      <h2>Sou Atendente</h2>
+      <p>Gerencie as demandas e atualize o status das solicitações</p>
+      <button class="pc-btn">Acessar Painel</button>
+    </div>
+  </div>
+
+  <div class="perfil-footer">
+    ODS 10 · 11 · 16 &nbsp;|&nbsp; v1.0 – 2026
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     T02 — REGISTRAR SOLICITAÇÃO
+     POST /api/cidadao/solicitacoes/{identificada|anonima}
+═══════════════════════════════════════════════ -->
+<div id="screen-registrar" class="screen">
+  <div class="cit-header">
+    <div class="cit-header-inner">
+      <button class="back-btn" onclick="showScreen('perfil')">←</button>
+      <span class="header-logo-sm">🏛️</span>
+      <span class="header-title">Nova Solicitação</span>
+    </div>
+  </div>
+
+  <div class="citizen-wrap" style="padding-top:28px;">
+    <div class="citizen-form">
+
+      <div class="tipo-toggle">
+        <button class="tipo-btn active" id="btn-identificada" onclick="setTipo('identificada')">
+          👤 Identificada
+        </button>
+        <button class="tipo-btn" id="btn-anonima" onclick="setTipo('anonima')">
+          🔒 Anônima
+        </button>
+      </div>
+
+      <!-- Campos Identificada -->
+      <div id="campos-identificada">
+        <div class="form-section">
+          <div class="form-section-label">👤 Seus dados</div>
+          <div class="form-group" id="fg-nome">
+            <label>Nome completo *</label>
+            <input id="f-nome" type="text" placeholder="Mínimo 3 caracteres">
+            <div class="error" id="err-nome">Informe seu nome completo.</div>
+          </div>
+          <div class="form-group" id="fg-email">
+            <label>E-mail *</label>
+            <input id="f-email" type="email" placeholder="seu@email.com">
+            <div class="error" id="err-email">Informe um e-mail válido.</div>
+          </div>
+          <div class="form-group">
+            <label>Telefone <span style="font-weight:400;color:var(--text-3)">(opcional)</span></label>
+            <input id="f-telefone" type="tel" placeholder="(00) 00000-0000">
+          </div>
+        </div>
+      </div>
+
+      <!-- Campos Anônima -->
+      <div id="campos-anonima" style="display:none;">
+        <div class="card-accent" style="margin-bottom:16px;">
+          <strong>🔒 Modo anônimo ativado</strong>
+          <p style="font-size:13px;color:var(--text-2);margin-top:6px;">Nenhum dado pessoal será armazenado. A descrição deve ter mínimo de 20 caracteres.</p>
+        </div>
+        <div class="form-group" id="fg-motivo">
+          <label>Por que você prefere o anonimato? *</label>
+          <textarea id="f-motivo" placeholder="Ex: receio de retaliação, assunto sensível..."></textarea>
+          <div class="error" id="err-motivo">Informe o motivo do anonimato.</div>
+        </div>
+      </div>
+
+      <!-- Campos Comuns -->
+      <div class="form-section">
+        <div class="form-section-label">📋 Sobre o problema</div>
+
+        <div class="form-group" id="fg-categoria">
+          <label>Categoria *</label>
+          <div class="cat-grid" id="cat-grid">
+            <div class="cat-btn" data-cat="ILUMINACAO" onclick="selectCat(this)"><span class="cat-emoji">💡</span><span class="cat-label">Iluminação</span></div>
+            <div class="cat-btn" data-cat="BURACO"     onclick="selectCat(this)"><span class="cat-emoji">🚧</span><span class="cat-label">Buraco na via</span></div>
+            <div class="cat-btn" data-cat="LIMPEZA"    onclick="selectCat(this)"><span class="cat-emoji">🧹</span><span class="cat-label">Limpeza urbana</span></div>
+            <div class="cat-btn" data-cat="SAUDE"      onclick="selectCat(this)"><span class="cat-emoji">🏥</span><span class="cat-label">Saúde</span></div>
+            <div class="cat-btn" data-cat="SEGURANCA"  onclick="selectCat(this)"><span class="cat-emoji">🔒</span><span class="cat-label">Segurança</span></div>
+            <div class="cat-btn" data-cat="ZELADORIA"  onclick="selectCat(this)"><span class="cat-emoji">🌿</span><span class="cat-label">Zeladoria</span></div>
+            <div class="cat-btn" data-cat="OUTROS" style="grid-column:1/-1" onclick="selectCat(this)"><span class="cat-emoji">📝</span><span class="cat-label">Outros</span></div>
+          </div>
+          <div class="error" id="err-categoria">Selecione uma categoria.</div>
+        </div>
+
+        <div class="form-group" id="fg-prioridade">
+          <label>Urgência *</label>
+          <div class="prio-row">
+            <button class="prio-btn" data-prio="BAIXA" onclick="selectPrio(this)"><span>Baixa</span><span>7 dias</span></button>
+            <button class="prio-btn" data-prio="MEDIA" onclick="selectPrio(this)"><span>Média</span><span>3 dias</span></button>
+            <button class="prio-btn" data-prio="ALTA"  onclick="selectPrio(this)"><span>Alta</span><span>1 dia</span></button>
+          </div>
+          <div class="error" id="err-prioridade">Selecione a urgência.</div>
+        </div>
+
+        <div class="form-group" id="fg-local">
+          <label>📍 Localização *</label>
+          <input id="f-local" type="text" placeholder="Rua, número, bairro...">
+          <div class="error" id="err-local">Informe a localização.</div>
+        </div>
+
+        <div class="form-group" id="fg-desc">
+          <label>Descrição *</label>
+          <textarea id="f-desc" placeholder="Descreva o problema com o máximo de detalhes..."></textarea>
+          <div class="hint" id="hint-desc">Mínimo 10 caracteres.</div>
+          <div class="error" id="err-desc">A descrição deve ter pelo menos 10 caracteres.</div>
+        </div>
+
+        <div class="form-group">
+          <label>📎 Anexo <span style="font-weight:400;color:var(--text-3)">(opcional)</span></label>
+          <input id="f-anexo" type="text" placeholder="Nome ou URL do arquivo">
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-registrar" onclick="submitRegistrar()" style="margin-top:8px;">
+        📤 Enviar Solicitação
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     T03 — CONFIRMAÇÃO DE REGISTRO
+     Exibe response 201 do POST
+═══════════════════════════════════════════════ -->
+<div id="screen-confirmacao" class="screen">
+  <div class="cit-header">
+    <div class="cit-header-inner">
+      <button class="back-btn" onclick="showScreen('registrar')">←</button>
+      <span class="header-logo-sm">🏛️</span>
+      <span class="header-title">Solicitação Enviada</span>
+    </div>
+  </div>
+
+  <div class="citizen-wrap" style="padding-top:28px;">
+    <div class="citizen-form">
+      <div class="confim-top">
+        <span class="confirm-check">✅</span>
+        <h2 class="confirm-title">Solicitação registrada!</h2>
+        <p class="confirm-sub">Sua demanda foi recebida e será analisada em breve.</p>
+      </div>
+
+      <div class="protocol-ticket" id="ticket-card">
+        <div class="ticket-label">🔑 Número do Protocolo — guarde este código</div>
+        <div class="ticket-number" id="conf-protocolo">—</div>
+        <div class="ticket-row">
+          <div style="font-size:12px;color:#9CA3AF;" id="conf-prazo"></div>
+          <div class="ticket-actions">
+            <button class="btn-copy" onclick="copyProtocolo()">📋 Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-flat" style="margin-bottom:16px;">
+        <div class="kv">
+          <span class="kv-label">Prazo SLA</span>
+          <span class="kv-value" id="conf-sla-prazo">—</span>
+        </div>
+        <div class="kv">
+          <span class="kv-label">Indicador</span>
+          <span class="kv-value" id="conf-sla-ind">—</span>
+        </div>
+        <div class="kv">
+          <span class="kv-label">Prioridade</span>
+          <span class="kv-value" id="conf-prioridade">—</span>
+        </div>
+        <div class="kv">
+          <span class="kv-label">Categoria</span>
+          <span class="kv-value" id="conf-categoria">—</span>
+        </div>
+      </div>
+
+      <div id="conf-anon-notice" class="anon-notice" style="display:none;">
+        🔒 Nenhum dado pessoal foi armazenado nesta solicitação.
+      </div>
+
+      <p style="font-size:13px;font-weight:700;color:var(--danger);text-align:center;margin-bottom:16px;">
+        ⚠️ Anote o protocolo agora — não será exibido novamente
+      </p>
+
+      <button class="btn btn-primary" onclick="irParaConsultar()" style="margin-bottom:10px;">
+        🔍 Acompanhar Solicitação
+      </button>
+      <button class="btn btn-secondary" onclick="novaRegistrar()">
+        📋 Registrar outra
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     T04 — CONSULTAR SOLICITAÇÃO (CIDADÃO)
+     GET /api/cidadao/solicitacoes/{protocolo}
+═══════════════════════════════════════════════ -->
+<div id="screen-consultar" class="screen">
+  <div class="cit-header">
+    <div class="cit-header-inner">
+      <button class="back-btn" onclick="showScreen('perfil')">←</button>
+      <span class="header-logo-sm">🏛️</span>
+      <span class="header-title">Consultar Solicitação</span>
+    </div>
+  </div>
+
+  <div class="citizen-wrap" style="padding-top:28px;">
+    <div class="citizen-form">
+
+      <div class="card" style="margin-bottom:8px;">
+        <p style="font-size:14px;color:var(--text-2);margin-bottom:14px;">
+          Informe o número do protocolo recebido ao registrar sua solicitação.
+        </p>
+        <div class="search-box">
+          <input id="input-protocolo" type="text" placeholder="OBS-2026-00001"
+                 style="text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);font-size:16px;"
+                 onkeydown="if(event.key==='Enter') consultarProtocolo()">
+          <button class="btn btn-primary" style="width:auto;flex-shrink:0;padding:11px 20px;" onclick="consultarProtocolo()">
+            🔍 Consultar
+          </button>
+        </div>
+        <p style="font-size:12px;color:var(--text-3);">Formato: OBS-AAAA-NNNNN (ex: OBS-2026-00001)</p>
+      </div>
+
+      <!-- Resultado -->
+      <div id="consulta-resultado">
+        <div class="status-hero" id="res-hero">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+            <div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:4px;">Protocolo</div>
+              <div style="font-family:var(--mono);font-size:16px;font-weight:700;" id="res-proto">—</div>
+            </div>
+            <span id="res-badge-status">—</span>
+          </div>
+          <div id="res-progress" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px;"></div>
+          <div style="display:flex;gap:20px;">
+            <div><div style="font-size:11px;color:var(--text-3);">Prazo SLA</div><div style="font-size:14px;font-weight:700;" id="res-prazo">—</div></div>
+            <div><div style="font-size:11px;color:var(--text-3);">Indicador</div><div id="res-sla">—</div></div>
+          </div>
+        </div>
+
+        <div class="card-flat">
+          <div class="kv"><span class="kv-label">📋 Categoria</span><span class="kv-value" id="res-cat">—</span></div>
+          <div class="kv"><span class="kv-label">📌 Prioridade</span><span class="kv-value" id="res-prio">—</span></div>
+          <div class="kv"><span class="kv-label">📍 Localização</span><span class="kv-value" id="res-loc">—</span></div>
+          <div class="kv"><span class="kv-label">📅 Abertura</span><span class="kv-value" id="res-abertura">—</span></div>
+        </div>
+
+        <div class="card-flat">
+          <p style="font-size:13px;font-weight:700;margin-bottom:4px;">Descrição</p>
+          <p style="font-size:14px;color:var(--text-2);" id="res-desc">—</p>
+        </div>
+
+        <div class="card-flat">
+          <p style="font-size:13px;font-weight:700;margin-bottom:16px;">🕐 Histórico de movimentações</p>
+          <div class="timeline" id="res-historico"></div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="limparConsulta()" style="margin-top:4px;">
+          🔍 Nova consulta
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     T05 — LISTA DE SOLICITAÇÕES (ATENDENTE)
+     GET /api/gestor/solicitacoes?status=&categoria=&prioridade=
+═══════════════════════════════════════════════ -->
+<div id="screen-lista" class="screen desk-screen">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏛️</div>
+      <div class="logo-name">ObservaAção</div>
+      <div class="logo-sub">Painel de Atendimento</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showScreen('lista')">
+        <span class="nav-icon">📋</span> Solicitações
+      </button>
+      <button class="nav-item" onclick="showScreen('perfil')">
+        <span class="nav-icon">🏠</span> Início
+      </button>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-name">👔 Atendente</div>
+      <div class="user-role">Painel de Gestão</div>
+      <button class="btn-logout" onclick="showScreen('perfil')">Sair</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="desk-main">
+    <div class="desk-topbar">
+      <h1>📋 Solicitações</h1>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="carregarLista()">🔄 Atualizar</button>
+      </div>
+    </div>
+    <div class="desk-content">
+      <!-- Filtros -->
+      <div class="filter-bar">
+        <span class="filter-label">Status</span>
+        <button class="filter-chip active" data-filter="status" data-value="" onclick="setFiltro('status','',this)">Todos</button>
+        <button class="filter-chip" data-filter="status" data-value="ABERTO" onclick="setFiltro('status','ABERTO',this)">📬 Aberto</button>
+        <button class="filter-chip" data-filter="status" data-value="TRIAGEM" onclick="setFiltro('status','TRIAGEM',this)">🔄 Triagem</button>
+        <button class="filter-chip" data-filter="status" data-value="EM_EXECUCAO" onclick="setFiltro('status','EM_EXECUCAO',this)">⚙️ Execução</button>
+        <button class="filter-chip" data-filter="status" data-value="RESOLVIDO" onclick="setFiltro('status','RESOLVIDO',this)">✅ Resolvido</button>
+        <button class="filter-chip" data-filter="status" data-value="ENCERRADO" onclick="setFiltro('status','ENCERRADO',this)">🔒 Encerrado</button>
+      </div>
+      <div class="filter-bar">
+        <span class="filter-label">Prioridade</span>
+        <button class="filter-chip active" data-filter="prioridade" data-value="" onclick="setFiltro('prioridade','',this)">Todas</button>
+        <button class="filter-chip" data-filter="prioridade" data-value="ALTA" onclick="setFiltro('prioridade','ALTA',this)">🔴 Alta</button>
+        <button class="filter-chip" data-filter="prioridade" data-value="MEDIA" onclick="setFiltro('prioridade','MEDIA',this)">🟡 Média</button>
+        <button class="filter-chip" data-filter="prioridade" data-value="BAIXA" onclick="setFiltro('prioridade','BAIXA',this)">🟢 Baixa</button>
+        <span class="filter-label" style="margin-left:12px;">Categoria</span>
+        <button class="filter-chip active" data-filter="categoria" data-value="" onclick="setFiltro('categoria','',this)">Todas</button>
+        <button class="filter-chip" data-filter="categoria" data-value="ILUMINACAO" onclick="setFiltro('categoria','ILUMINACAO',this)">💡</button>
+        <button class="filter-chip" data-filter="categoria" data-value="BURACO" onclick="setFiltro('categoria','BURACO',this)">🚧</button>
+        <button class="filter-chip" data-filter="categoria" data-value="LIMPEZA" onclick="setFiltro('categoria','LIMPEZA',this)">🧹</button>
+        <button class="filter-chip" data-filter="categoria" data-value="SAUDE" onclick="setFiltro('categoria','SAUDE',this)">🏥</button>
+        <button class="filter-chip" data-filter="categoria" data-value="SEGURANCA" onclick="setFiltro('categoria','SEGURANCA',this)">🔒</button>
+        <button class="filter-chip" data-filter="categoria" data-value="ZELADORIA" onclick="setFiltro('categoria','ZELADORIA',this)">🌿</button>
+        <button class="filter-chip" data-filter="categoria" data-value="OUTROS" onclick="setFiltro('categoria','OUTROS',this)">📝</button>
+      </div>
+
+      <div id="lista-container">
+        <div class="empty-state">
+          <div class="empty-icon">📋</div>
+          <p>Carregando solicitações...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     T06 — DETALHE + ATUALIZAR STATUS (ATENDENTE)
+     GET  /api/gestor/solicitacoes/{protocolo}
+     PATCH /api/gestor/solicitacoes/{protocolo}/status
+═══════════════════════════════════════════════ -->
+<div id="screen-detalhe" class="screen desk-screen">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🏛️</div>
+      <div class="logo-name">ObservaAção</div>
+      <div class="logo-sub">Painel de Atendimento</div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" onclick="showScreen('lista')">
+        <span class="nav-icon">📋</span> Solicitações
+      </button>
+      <button class="nav-item active">
+        <span class="nav-icon">🔍</span> Detalhe
+      </button>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-name">👔 Atendente</div>
+      <div class="user-role">Painel de Gestão</div>
+      <button class="btn-logout" onclick="showScreen('perfil')">Sair</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="desk-main">
+    <div class="desk-topbar">
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('lista')" style="gap:4px;">← Voltar</button>
+      <h1 id="det-topbar-proto" style="font-family:var(--mono);font-size:16px;">—</h1>
+      <span id="det-topbar-badges" style="display:flex;gap:6px;align-items:center;"></span>
+      <div class="topbar-actions">
+        <button class="btn btn-secondary btn-sm" onclick="recarregarDetalhe()">🔄 Atualizar</button>
+      </div>
+    </div>
+    <div class="desk-content">
+      <div class="detail-grid">
+        <!-- Coluna esquerda: dados -->
+        <div>
+          <!-- Status e dados gerais -->
+          <div class="card" style="margin-bottom:16px;">
+            <h3 style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:14px;">📋 Dados da Solicitação</h3>
+            <div class="kv"><span class="kv-label">Protocolo</span><span class="kv-value" style="font-family:var(--mono);" id="det-protocolo">—</span></div>
+            <div class="kv"><span class="kv-label">Status</span><span class="kv-value" id="det-status">—</span></div>
+            <div class="kv"><span class="kv-label">Categoria</span><span class="kv-value" id="det-categoria">—</span></div>
+            <div class="kv"><span class="kv-label">Prioridade</span><span class="kv-value" id="det-prioridade">—</span></div>
+            <div class="kv"><span class="kv-label">SLA</span><span class="kv-value" id="det-sla">—</span></div>
+            <div class="kv"><span class="kv-label">Prazo</span><span class="kv-value" id="det-prazo">—</span></div>
+            <div class="kv"><span class="kv-label">📍 Localização</span><span class="kv-value" id="det-local">—</span></div>
+            <div class="kv"><span class="kv-label">📅 Abertura</span><span class="kv-value" id="det-abertura">—</span></div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="card-flat" style="margin-bottom:16px;">
+            <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:8px;">Descrição</p>
+            <p style="font-size:14px;color:var(--text-2);line-height:1.6;" id="det-desc">—</p>
+          </div>
+
+          <!-- Dados do cidadão (condicional) -->
+          <div id="det-cidadao-card" class="card-flat" style="margin-bottom:16px;display:none;">
+            <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:12px;">👤 Dados do Cidadão</p>
+            <div class="kv"><span class="kv-label">Nome</span><span class="kv-value" id="det-nome">—</span></div>
+            <div class="kv"><span class="kv-label">E-mail</span><span class="kv-value" id="det-email">—</span></div>
+            <div class="kv" id="det-tel-row"><span class="kv-label">Telefone</span><span class="kv-value" id="det-tel">—</span></div>
+          </div>
+          <div id="det-anon-card" class="card-accent" style="margin-bottom:16px;display:none;">
+            🔒 <strong>Solicitação anônima</strong> — Nenhum dado pessoal foi armazenado.
+          </div>
+
+          <!-- Histórico -->
+          <div class="card-flat">
+            <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:16px;">🕐 Histórico de movimentações</p>
+            <div class="timeline" id="det-historico"></div>
+          </div>
+        </div>
+
+        <!-- Coluna direita: atualizar status -->
+        <div>
+          <div class="update-card">
+            <h3>⚡ Atualizar Status</h3>
+            <div class="form-group" id="fg-novo-status">
+              <label>Novo status *</label>
+              <select id="select-status">
+                <option value="">— Selecionar —</option>
+              </select>
+              <div class="error" id="err-novo-status">Selecione o novo status.</div>
+              <div class="hint" id="hint-transicao">Fluxo: ABERTO → TRIAGEM → EM_EXECUCAO → RESOLVIDO → ENCERRADO</div>
+            </div>
+            <div class="form-group" id="fg-comentario">
+              <label>Comentário * <span style="font-weight:400;color:var(--text-3);font-size:12px;">(obrigatório)</span></label>
+              <textarea id="input-comentario" placeholder="Descreva a ação tomada..." rows="4"></textarea>
+              <div class="error" id="err-comentario">Informe um comentário.</div>
+            </div>
+            <div class="form-group" id="fg-responsavel">
+              <label>Responsável * <span style="font-weight:400;color:var(--text-3);font-size:12px;">(obrigatório)</span></label>
+              <input id="input-responsavel" type="text" placeholder="Nome ou setor responsável">
+              <div class="error" id="err-responsavel">Informe o responsável.</div>
+            </div>
+            <button class="btn btn-primary" id="btn-atualizar" onclick="atualizarStatus()">
+              💾 Salvar Atualização
+            </button>
+
+            <div class="response-codes" style="margin-top:16px;">
+              <p>Respostas possíveis</p>
+              <div class="rc-row"><span class="rc-code rc-200">200</span> Atualizado com sucesso</div>
+              <div class="rc-row"><span class="rc-code rc-400">400</span> Campo obrigatório ausente</div>
+              <div class="rc-row"><span class="rc-code rc-404">404</span> Protocolo não encontrado</div>
+              <div class="rc-row"><span class="rc-code rc-422">422</span> Transição de status inválida</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT — State, API, Navigation, Handlers
+══════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── Constants ─────────────────────────────────────── */
+const CATEGORIA_LABEL = { ILUMINACAO:'💡 Iluminação', BURACO:'🚧 Buraco na via', LIMPEZA:'🧹 Limpeza urbana', SAUDE:'🏥 Saúde', SEGURANCA:'🔒 Segurança', ZELADORIA:'🌿 Zeladoria', OUTROS:'📝 Outros' };
+const PRIORIDADE_LABEL = { BAIXA:'🟢 Baixa (7 dias)', MEDIA:'🟡 Média (3 dias)', ALTA:'🔴 Alta (1 dia)' };
+const STATUS_CONFIG = {
+  ABERTO:     { emoji:'📬', label:'Aberto',       badge:'badge-aberto' },
+  TRIAGEM:    { emoji:'🔄', label:'Em Triagem',   badge:'badge-triagem' },
+  EM_EXECUCAO:{ emoji:'⚙️', label:'Em Execução', badge:'badge-execucao' },
+  RESOLVIDO:  { emoji:'✅', label:'Resolvido',    badge:'badge-resolvido' },
+  ENCERRADO:  { emoji:'🔒', label:'Encerrado',    badge:'badge-encerrado' },
+};
+const STATUS_FLOW = ['ABERTO','TRIAGEM','EM_EXECUCAO','RESOLVIDO','ENCERRADO'];
+const SLA_CONFIG = {
+  VERDE:  { emoji:'🟢', label:'No prazo',  cls:'sla-verde' },
+  AMARELO:{ emoji:'🟡', label:'Atenção',   cls:'sla-amarelo' },
+  VENCIDO:{ emoji:'🔴', label:'Vencido',   cls:'sla-vencido' },
+};
+const PRIO_BADGE = { BAIXA:'badge-baixa', MEDIA:'badge-media', ALTA:'badge-alta' };
+
+/* ── State ─────────────────────────────────────────── */
+const STATE = {
+  tipo: 'identificada',
+  categoria: null,
+  prioridade: null,
+  confirmacao: null,
+  protocoloConfirmado: null,
+  filtros: { status:'', categoria:'', prioridade:'' },
+  detalheProtocolo: null,
+};
+
+/* ── API Layer ──────────────────────────────────────── */
+const API_BASE = ''; // mesmo origin — Spring Boot serve /api/...
+
+async function apiCall(method, path, body) {
+  const opts = { method, headers:{'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API_BASE + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ erro: `Erro ${res.status}` }));
+    throw new Error(err.erro || `Erro ${res.status}`);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+const api = {
+  post:  (p, b) => apiCall('POST',  p, b),
+  get:   (p)    => apiCall('GET',   p),
+  patch: (p, b) => apiCall('PATCH', p, b),
+};
+
+/* ── UI Utilities ───────────────────────────────────── */
+function showLoading(on) {
+  document.getElementById('loading').classList.toggle('show', on);
+}
+let toastTimer;
+function toast(msg, type='info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast-${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3800);
+}
+
+function setButtonLoading(id, loading, label='') {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  btn.disabled = loading;
+  if (loading) btn.dataset.original = btn.textContent;
+  btn.textContent = loading ? '⏳ Aguarde...' : (label || btn.dataset.original || btn.textContent);
+}
+
+function formatDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+function formatDateShort(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function badgeHtml(status) {
+  const c = STATUS_CONFIG[status] || { emoji:'?', label:status, badge:'badge-encerrado' };
+  return `<span class="badge ${c.badge}">${c.emoji} ${c.label}</span>`;
+}
+function slaHtml(ind) {
+  const c = SLA_CONFIG[ind] || { emoji:'?', label:ind, cls:'sla-vencido' };
+  return `<span class="${c.cls}">${c.emoji} ${c.label}</span>`;
+}
+function prioBadgeHtml(p) {
+  return `<span class="badge ${PRIO_BADGE[p]||'badge-baixa'}">${PRIORIDADE_LABEL[p]||p}</span>`;
+}
+
+function renderTimeline(historico, containerId) {
+  const container = document.getElementById(containerId);
+  if (!historico || historico.length === 0) {
+    container.innerHTML = '<p style="font-size:14px;color:var(--text-3);text-align:center;">Nenhuma movimentação registrada.</p>';
+    return;
+  }
+  container.innerHTML = historico.map((m, i) => {
+    const isCurrent = i === historico.length - 1;
+    const transicao = m.statusAnterior
+      ? `${STATUS_CONFIG[m.statusAnterior]?.label || m.statusAnterior} → ${STATUS_CONFIG[m.statusNovo]?.label || m.statusNovo}`
+      : `${STATUS_CONFIG[m.statusNovo]?.label || m.statusNovo}`;
+    return `
+      <div class="tl-item">
+        <div class="tl-left">
+          <div class="tl-dot ${isCurrent ? 'current' : ''}"></div>
+          ${i < historico.length - 1 ? '<div class="tl-line"></div>' : ''}
+        </div>
+        <div class="tl-body">
+          <div class="tl-meta">📅 ${formatDate(m.dataHora)}</div>
+          <div class="tl-title">${transicao}</div>
+          ${m.comentario ? `<div class="tl-comment">"${m.comentario}"</div>` : ''}
+          ${m.responsavel ? `<div class="tl-resp">👤 ${m.responsavel}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Navigation ─────────────────────────────────────── */
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const sc = document.getElementById('screen-' + name);
+  if (sc) sc.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startCidadao() {
+  showScreen('registrar');
+}
+function startAtendente() {
+  showScreen('lista');
+  carregarLista();
+}
+
+/* ── T02: Registrar Solicitação ──────────────────────── */
+function setTipo(tipo) {
+  STATE.tipo = tipo;
+  document.getElementById('btn-identificada').classList.toggle('active', tipo==='identificada');
+  document.getElementById('btn-anonima').classList.toggle('active', tipo==='anonima');
+  document.getElementById('campos-identificada').style.display = tipo==='identificada' ? '' : 'none';
+  document.getElementById('campos-anonima').style.display = tipo==='anonima' ? '' : 'none';
+  const hintDesc = document.getElementById('hint-desc');
+  if (hintDesc) hintDesc.textContent = tipo==='anonima' ? 'Mínimo 20 caracteres.' : 'Mínimo 10 caracteres.';
+}
+
+function selectCat(el) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  STATE.categoria = el.dataset.cat;
+  clearError('fg-categoria');
+}
+
+function selectPrio(el) {
+  document.querySelectorAll('.prio-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  STATE.prioridade = el.dataset.prio;
+  clearError('fg-prioridade');
+}
+
+function clearError(id) {
+  document.getElementById(id)?.classList.remove('has-error');
+}
+
+function showError(fgId, errId) {
+  document.getElementById(fgId)?.classList.add('has-error');
+}
+
+function validateRegistrar() {
+  let ok = true;
+  const tipo = STATE.tipo;
+
+  if (tipo === 'identificada') {
+    const nome = document.getElementById('f-nome').value.trim();
+    if (nome.length < 3) { showError('fg-nome'); ok = false; }
+    else clearError('fg-nome');
+    const email = document.getElementById('f-email').value.trim();
+    if (!email.includes('@') || !email.includes('.')) { showError('fg-email'); ok = false; }
+    else clearError('fg-email');
+  } else {
+    const motivo = document.getElementById('f-motivo').value.trim();
+    if (!motivo) { showError('fg-motivo'); ok = false; }
+    else clearError('fg-motivo');
+  }
+
+  if (!STATE.categoria) { showError('fg-categoria'); ok = false; }
+  else clearError('fg-categoria');
+  if (!STATE.prioridade) { showError('fg-prioridade'); ok = false; }
+  else clearError('fg-prioridade');
+
+  const local = document.getElementById('f-local').value.trim();
+  if (!local) { showError('fg-local'); ok = false; }
+  else clearError('fg-local');
+
+  const desc = document.getElementById('f-desc').value.trim();
+  const minDesc = STATE.tipo === 'anonima' ? 20 : 10;
+  if (desc.length < minDesc) { showError('fg-desc'); ok = false; }
+  else clearError('fg-desc');
+
+  return ok;
+}
+
+async function submitRegistrar() {
+  if (!validateRegistrar()) {
+    toast('⚠️ Corrija os campos destacados.', 'error');
+    return;
+  }
+  setButtonLoading('btn-registrar', true);
+  const tipo = STATE.tipo;
+  let body = {
+    categoria: STATE.categoria,
+    prioridade: STATE.prioridade,
+    localizacao: document.getElementById('f-local').value.trim(),
+    descricao: document.getElementById('f-desc').value.trim(),
+  };
+  if (tipo === 'identificada') {
+    body.nomeCompleto = document.getElementById('f-nome').value.trim();
+    body.email        = document.getElementById('f-email').value.trim();
+    body.telefone     = document.getElementById('f-telefone').value.trim() || null;
+    body.anexo        = document.getElementById('f-anexo').value.trim() || null;
+  } else {
+    body.motivoAnonimato = document.getElementById('f-motivo').value.trim();
+  }
+  try {
+    const data = await api.post(`/api/cidadao/solicitacoes/${tipo}`, body);
+    STATE.confirmacao = data;
+    STATE.protocoloConfirmado = data.protocolo;
+    renderConfirmacao(data);
+    showScreen('confirmacao');
+  } catch (e) {
+    toast('❌ ' + e.message, 'error');
+  } finally {
+    setButtonLoading('btn-registrar', false);
+  }
+}
+
+function novaRegistrar() {
+  // Limpar form
+  ['f-nome','f-email','f-telefone','f-motivo','f-local','f-desc','f-anexo'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.prio-btn').forEach(b => b.classList.remove('selected'));
+  STATE.categoria = null;
+  STATE.prioridade = null;
+  setTipo('identificada');
+  showScreen('registrar');
+}
+
+/* ── T03: Confirmação ────────────────────────────────── */
+function renderConfirmacao(data) {
+  document.getElementById('conf-protocolo').textContent = data.protocolo || '—';
+  document.getElementById('conf-sla-prazo').textContent = formatDate(data.prazoSla);
+  const sla = SLA_CONFIG[data.indicadorSla] || {};
+  document.getElementById('conf-sla-ind').innerHTML = slaHtml(data.indicadorSla);
+  document.getElementById('conf-prioridade').innerHTML = prioBadgeHtml(data.prioridade);
+  document.getElementById('conf-categoria').textContent = CATEGORIA_LABEL[data.categoria] || data.categoria;
+  const anonNotice = document.getElementById('conf-anon-notice');
+  if (anonNotice) anonNotice.style.display = data.anonima ? '' : 'none';
+}
+
+function copyProtocolo() {
+  const proto = document.getElementById('conf-protocolo').textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(proto).then(() => toast('✅ Protocolo copiado!', 'success'));
+  } else {
+    toast('Protocolo: ' + proto);
+  }
+}
+
+function irParaConsultar() {
+  showScreen('consultar');
+  const input = document.getElementById('input-protocolo');
+  if (input && STATE.protocoloConfirmado) {
+    input.value = STATE.protocoloConfirmado;
+    consultarProtocolo();
+  }
+}
+
+/* ── T04: Consultar ──────────────────────────────────── */
+function limparConsulta() {
+  document.getElementById('consulta-resultado').style.display = 'none';
+  document.getElementById('input-protocolo').value = '';
+}
+
+async function consultarProtocolo() {
+  const input = document.getElementById('input-protocolo');
+  const protocolo = input.value.trim().toUpperCase();
+  if (!protocolo) { toast('⚠️ Informe o número do protocolo.', 'error'); return; }
+  input.value = protocolo;
+
+  showLoading(true);
+  document.getElementById('consulta-resultado').style.display = 'none';
+  try {
+    const data = await api.get(`/api/cidadao/solicitacoes/${protocolo}`);
+    renderConsultaResult(data);
+    document.getElementById('consulta-resultado').style.display = '';
+  } catch (e) {
+    toast('❌ ' + e.message, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+function renderConsultaResult(data) {
+  document.getElementById('res-proto').textContent = data.protocolo;
+  document.getElementById('res-badge-status').innerHTML = badgeHtml(data.status);
+  document.getElementById('res-prazo').textContent = formatDateShort(data.prazoSla);
+  document.getElementById('res-sla').innerHTML = slaHtml(data.indicadorSla);
+  document.getElementById('res-cat').textContent = CATEGORIA_LABEL[data.categoria] || data.categoria;
+  document.getElementById('res-prio').innerHTML = prioBadgeHtml(data.prioridade);
+  document.getElementById('res-loc').textContent = data.localizacao || '—';
+  document.getElementById('res-abertura').textContent = formatDate(data.dataAbertura);
+  document.getElementById('res-desc').textContent = data.descricao || '—';
+  // Progress indicator
+  const idx = STATUS_FLOW.indexOf(data.status);
+  const progress = document.getElementById('res-progress');
+  progress.innerHTML = STATUS_FLOW.map((s, i) => {
+    const cfg = STATUS_CONFIG[s];
+    const active = i <= idx;
+    return `<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:${active ? 'var(--primary-lt)' : 'transparent'};color:${active ? 'var(--primary)' : 'var(--text-3)'};">${cfg.emoji} ${cfg.label}</span>`;
+  }).join('<span style="color:var(--text-3);font-size:11px;">›</span>');
+  renderTimeline(data.historico || [], 'res-historico');
+}
+
+/* ── T05: Lista ─────────────────────────────────────── */
+function setFiltro(tipo, valor, btn) {
+  STATE.filtros[tipo] = valor;
+  // Deactivate siblings
+  document.querySelectorAll(`.filter-chip[data-filter="${tipo}"]`).forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  carregarLista();
+}
+
+async function carregarLista() {
+  const { status, categoria, prioridade } = STATE.filtros;
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (categoria) params.set('categoria', categoria);
+  if (prioridade) params.set('prioridade', prioridade);
+  const qs = params.toString() ? '?' + params.toString() : '';
+
+  showLoading(true);
+  try {
+    const data = await api.get('/api/gestor/solicitacoes' + qs);
+    renderLista(data);
+  } catch (e) {
+    document.getElementById('lista-container').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">❌</div><p>${e.message}</p></div>`;
+  } finally {
+    showLoading(false);
+  }
+}
+
+function renderLista(lista) {
+  const container = document.getElementById('lista-container');
+  if (!lista || lista.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Nenhuma solicitação encontrada com os filtros selecionados.</p></div>';
+    return;
+  }
+  const html = lista.map(item => {
+    const sla = SLA_CONFIG[item.indicadorSla] || { emoji:'?', label:'—', cls:'sla-vencido' };
+    const vencido = item.indicadorSla === 'VENCIDO';
+    return `
+      <div class="request-item ${vencido ? 'vencido' : ''}" onclick="abrirDetalhe('${item.protocolo}')">
+        <div class="item-proto">${item.protocolo}</div>
+        <div class="item-main">
+          <div class="item-cat">${CATEGORIA_LABEL[item.categoria] || item.categoria}</div>
+          <div class="item-date">📅 ${formatDate(item.dataAbertura)}</div>
+        </div>
+        <div class="item-badges">
+          ${badgeHtml(item.status)}
+          ${prioBadgeHtml(item.prioridade)}
+        </div>
+        <div class="item-sla">
+          <div class="${sla.cls}" style="font-size:13px;">${sla.emoji} ${sla.label}</div>
+          ${vencido ? '<div style="font-size:11px;color:var(--danger);font-weight:700;">VENCIDO</div>' : ''}
+        </div>
+      </div>`;
+  }).join('');
+  container.innerHTML = `<div class="request-list">${html}</div><p style="margin-top:12px;font-size:13px;color:var(--text-3);text-align:right;">${lista.length} solicitação(ões)</p>`;
+}
+
+/* ── T06: Detalhe + Atualizar ────────────────────────── */
+async function abrirDetalhe(protocolo) {
+  STATE.detalheProtocolo = protocolo;
+  showScreen('detalhe');
+  await carregarDetalhe(protocolo);
+}
+
+async function recarregarDetalhe() {
+  if (STATE.detalheProtocolo) await carregarDetalhe(STATE.detalheProtocolo);
+}
+
+async function carregarDetalhe(protocolo) {
+  showLoading(true);
+  try {
+    const data = await api.get(`/api/gestor/solicitacoes/${protocolo}`);
+    renderDetalhe(data);
+  } catch (e) {
+    toast('❌ ' + e.message, 'error');
+  } finally {
+    showLoading(false);
+  }
+}
+
+function renderDetalhe(data) {
+  // Topbar
+  document.getElementById('det-topbar-proto').textContent = data.protocolo;
+  document.getElementById('det-topbar-badges').innerHTML = badgeHtml(data.status) + ' ' + prioBadgeHtml(data.prioridade);
+  // KV fields
+  document.getElementById('det-protocolo').textContent = data.protocolo;
+  document.getElementById('det-status').innerHTML = badgeHtml(data.status);
+  document.getElementById('det-categoria').textContent = CATEGORIA_LABEL[data.categoria] || data.categoria;
+  document.getElementById('det-prioridade').innerHTML = prioBadgeHtml(data.prioridade);
+  document.getElementById('det-sla').innerHTML = slaHtml(data.indicadorSla);
+  document.getElementById('det-prazo').textContent = formatDate(data.prazoSla);
+  document.getElementById('det-local').textContent = data.localizacao || '—';
+  document.getElementById('det-abertura').textContent = formatDate(data.dataAbertura);
+  document.getElementById('det-desc').textContent = data.descricao || '—';
+  // Cidadão
+  const cidadaoCard = document.getElementById('det-cidadao-card');
+  const anonCard    = document.getElementById('det-anon-card');
+  if (data.anonima) {
+    cidadaoCard.style.display = 'none';
+    anonCard.style.display = '';
+  } else {
+    cidadaoCard.style.display = '';
+    anonCard.style.display = 'none';
+    document.getElementById('det-nome').textContent  = data.nomeCompleto || '—';
+    document.getElementById('det-email').textContent = data.email || '—';
+    const telRow = document.getElementById('det-tel-row');
+    if (data.telefone) {
+      document.getElementById('det-tel').textContent = data.telefone;
+      telRow.style.display = '';
+    } else {
+      telRow.style.display = 'none';
+    }
+  }
+  // Timeline
+  renderTimeline(data.historico || [], 'det-historico');
+  // Update form: populate valid transitions
+  populateTransicoes(data.status);
+  // Clear form
+  document.getElementById('input-comentario').value = '';
+  document.getElementById('input-responsavel').value = '';
+  ['fg-novo-status','fg-comentario','fg-responsavel'].forEach(clearError);
+}
+
+function populateTransicoes(statusAtual) {
+  const map = { ABERTO:['TRIAGEM'], TRIAGEM:['EM_EXECUCAO'], EM_EXECUCAO:['RESOLVIDO'], RESOLVIDO:['ENCERRADO'], ENCERRADO:[] };
+  const validos = map[statusAtual] || [];
+  const sel = document.getElementById('select-status');
+  sel.innerHTML = '<option value="">— Selecionar —</option>';
+  if (validos.length === 0) {
+    sel.innerHTML += '<option disabled>Nenhuma transição disponível (encerrado)</option>';
+    sel.disabled = true;
+    document.getElementById('btn-atualizar').disabled = true;
+  } else {
+    validos.forEach(s => {
+      const cfg = STATUS_CONFIG[s];
+      sel.innerHTML += `<option value="${s}">${cfg.emoji} ${cfg.label}</option>`;
+    });
+    sel.disabled = false;
+    document.getElementById('btn-atualizar').disabled = false;
+  }
+}
+
+async function atualizarStatus() {
+  let ok = true;
+  const novoStatus  = document.getElementById('select-status').value;
+  const comentario  = document.getElementById('input-comentario').value.trim();
+  const responsavel = document.getElementById('input-responsavel').value.trim();
+  if (!novoStatus)  { showError('fg-novo-status');  ok = false; } else clearError('fg-novo-status');
+  if (!comentario)  { showError('fg-comentario');   ok = false; } else clearError('fg-comentario');
+  if (!responsavel) { showError('fg-responsavel');  ok = false; } else clearError('fg-responsavel');
+  if (!ok) { toast('⚠️ Preencha todos os campos obrigatórios.', 'error'); return; }
+
+  setButtonLoading('btn-atualizar', true);
+  try {
+    const data = await api.patch(`/api/gestor/solicitacoes/${STATE.detalheProtocolo}/status`, { novoStatus, comentario, responsavel });
+    renderDetalhe(data);
+    toast('✅ Status atualizado com sucesso!', 'success');
+  } catch (e) {
+    toast('❌ ' + e.message, 'error');
+  } finally {
+    setButtonLoading('btn-atualizar', false);
+  }
+}
+
+/* ── Init ────────────────────────────────────────────── */
+showScreen('perfil');
+</script>
+</body>
+</html>

@@ -19,7 +19,7 @@ public abstract class Solicitacao {
     private final LocalDateTime dataAbertura;
     private final List<Movimentacao> historico;
 
-    private Prioridade prioridade;
+    private final Prioridade prioridade;
     private Status status;
 
     protected Solicitacao(String protocolo, Categoria categoria, String descricao,
@@ -80,9 +80,6 @@ public abstract class Solicitacao {
         return prioridade;
     }
 
-    public void setPrioridade(Prioridade prioridade) {
-        this.prioridade = prioridade;
-    }
 
     public Status getStatus() {
         return status;

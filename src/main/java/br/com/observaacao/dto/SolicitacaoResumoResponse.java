@@ -14,15 +14,18 @@ public class SolicitacaoResumoResponse {
     private final Status status;
     private final LocalDateTime dataAbertura;
     private final String indicadorSla;
+    private final boolean anonima;
 
     public SolicitacaoResumoResponse(String protocolo, Categoria categoria, Prioridade prioridade,
-                                     Status status, LocalDateTime dataAbertura, String indicadorSla) {
+                                     Status status, LocalDateTime dataAbertura, String indicadorSla,
+                                     boolean anonima) {
         this.protocolo = protocolo;
         this.categoria = categoria;
         this.prioridade = prioridade;
         this.status = status;
         this.dataAbertura = dataAbertura;
         this.indicadorSla = indicadorSla;
+        this.anonima = anonima;
     }
 
     public String getProtocolo() {
@@ -47,5 +50,9 @@ public class SolicitacaoResumoResponse {
 
     public String getIndicadorSla() {
         return indicadorSla;
+    }
+
+    public boolean isAnonima() {
+        return anonima;
     }
 }

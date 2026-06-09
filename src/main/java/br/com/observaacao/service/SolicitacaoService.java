@@ -128,7 +128,8 @@ public class SolicitacaoService {
             solicitacao.getPrioridade(),
             solicitacao.getStatus(),
             solicitacao.getDataAbertura(),
-            calcularIndicadorSla(solicitacao)
+            calcularIndicadorSla(solicitacao),
+            solicitacao.isAnonima()
         );
     }
 

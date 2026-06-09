@@ -20,7 +20,7 @@ public class SolicitacaoRepositoryEmMemoria implements SolicitacaoRepository {
 
     @Override
     public void salvar(Solicitacao solicitacao) {
-        dados.put(solicitacao.getProtocolo(), solicitacao);
+        dados.put(solicitacao.getProtocolo().toUpperCase(), solicitacao);
     }
 
     @Override

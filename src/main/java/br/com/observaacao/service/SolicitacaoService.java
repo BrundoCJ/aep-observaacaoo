@@ -19,12 +19,14 @@ import br.com.observaacao.repository.SolicitacaoRepository;
 import br.com.observaacao.util.GeradorProtocolo;
 import br.com.observaacao.util.Validador;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
+@Transactional
 public class SolicitacaoService {
 
     private final SolicitacaoRepository repository;
@@ -95,6 +97,7 @@ public class SolicitacaoService {
             throw new TransicaoStatusInvalidaException(ex.getMessage());
         }
 
+        repository.salvar(solicitacao);
         return construirRespostaDetalhada(solicitacao);
     }
 
@@ -186,7 +189,7 @@ public class SolicitacaoService {
         } else if (percentualRestante > 0.25) {
             return "AMARELO";
         } else {
-            return "VERMELHO";
+            return "AMARELO";
         }
     }
 }

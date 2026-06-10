@@ -8,327 +8,391 @@
 /* ── Reset & Tokens ────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --bg:         #F0F4FB;
+  /* Apple Aesthetic Palette */
+  --bg:         #F5F5F7;
   --card:       #FFFFFF;
-  --primary:    #2563EB;
-  --primary-dk: #1D4ED8;
-  --primary-lt: #EFF6FF;
-  --success:    #059669;
-  --success-lt: #ECFDF5;
-  --warn:       #D97706;
-  --warn-lt:    #FFFBEB;
-  --danger:     #DC2626;
-  --danger-lt:  #FEF2F2;
-  --gray-50:    #F9FAFB;
-  --gray-100:   #F3F4F6;
-  --gray-200:   #E5E7EB;
-  --gray-400:   #9CA3AF;
-  --gray-500:   #6B7280;
-  --gray-600:   #4B5563;
-  --gray-700:   #374151;
-  --gray-900:   #111827;
-  --text:       #1A2332;
-  --text-2:     #4B5563;
-  --text-3:     #9CA3AF;
-  --border:     #E5E7EB;
-  --radius:     16px;
-  --radius-sm:  10px;
-  --shadow:     0 1px 4px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.04);
-  --shadow-md:  0 4px 12px rgba(0,0,0,.1), 0 1px 4px rgba(0,0,0,.06);
-  --font:       -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  --mono:       'SF Mono', 'Fira Code', 'Courier New', monospace;
-  --trans:      .18s ease;
+  --primary:    #0071E3;
+  --primary-dk: #005BB5;
+  --primary-lt: #E8F2FC;
+  --success:    #34C759;
+  --success-lt: #EAF9EE;
+  --warn:       #FF9F0A;
+  --warn-lt:    #FFF5E6;
+  --danger:     #FF3B30;
+  --danger-lt:  #FFEBEA;
+  
+  --gray-50:    #FBFBFD;
+  --gray-100:   #F5F5F7;
+  --gray-200:   #E5E5EA;
+  --gray-300:   #D1D1D6;
+  --gray-400:   #C7C7CC;
+  --gray-500:   #AEAEB2;
+  --gray-600:   #8E8E93;
+  --gray-700:   #48484A;
+  --text:       #1D1D1F;
+  --text-2:     #86868B;
+  --text-3:     #A1A1A6;
+  --border:     rgba(0, 0, 0, 0.08);
+  --border-light: rgba(0, 0, 0, 0.04);
+  
+  --dark-bg:    #1C1C1E;
+  --dark-card:  #2C2C2E;
+  
+  --radius:     20px;
+  --radius-sm:  12px;
+  --radius-xs:  8px;
+  
+  --shadow-sm:  0 2px 8px rgba(0,0,0,.04);
+  --shadow:     0 4px 24px rgba(0,0,0,.04), 0 1px 3px rgba(0,0,0,.02);
+  --shadow-md:  0 8px 32px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+  
+  --font:       -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono:       "SF Mono", ui-monospace, "Fira Code", "Courier New", monospace;
+  --trans:      0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
-body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+body { 
+  font-family: var(--font); 
+  background: var(--bg); 
+  color: var(--text); 
+  line-height: 1.5; 
+  min-height: 100vh; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Custom Scrollbar ────────────────────────────── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
 /* ── Screens ─────────────────────────────────────── */
-.screen { display: none; min-height: 100vh; }
+.screen { display: none; min-height: 100vh; animation: fadeIn 0.4s ease forwards; }
 .screen.active { display: flex; flex-direction: column; }
-.screen.desk-screen.active { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.screen.desk-screen.active { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
 
-/* ── Citizen wrapper (max-width, centered) ────────── */
-.citizen-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 16px 40px; }
-.citizen-form  { width: 100%; max-width: 480px; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-/* ── Citizen header ───────────────────────────────── */
+/* ── Citizen wrapper ──────────────────────────────── */
+.citizen-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 0 20px 60px; }
+.citizen-form  { width: 100%; max-width: 500px; }
+
+/* ── Citizen header (Glassmorphism) ───────────────── */
 .cit-header {
-  background: var(--card); border-bottom: 1px solid var(--border);
-  padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+  background: rgba(255, 255, 255, 0.75); 
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 16px 24px; 
+  display: flex; align-items: center; gap: 12px;
   position: sticky; top: 0; z-index: 10; width: 100%;
 }
-.cit-header-inner { width: 100%; max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.cit-header-inner { width: 100%; max-width: 500px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
 .back-btn {
-  width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border);
-  background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 16px; color: var(--text-2); transition: var(--trans); flex-shrink: 0;
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: var(--gray-200); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text); transition: var(--trans); flex-shrink: 0;
 }
-.back-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
-.header-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.back-btn:hover { background: var(--gray-300); }
+.header-title { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.01em; }
 .header-logo-sm { font-size: 20px; }
 
 /* ── Cards ───────────────────────────────────────── */
-.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
-.card-flat { background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border); padding: 20px; margin-bottom: 16px; }
-.card-accent { background: var(--primary-lt); border-radius: var(--radius); border: 1.5px solid #BFDBFE; padding: 20px; margin-bottom: 16px; }
+.card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px; margin-bottom: 20px; border: 1px solid var(--border-light); }
+.card-flat { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; }
+.card-accent { background: var(--primary-lt); border-radius: var(--radius); border: 1px solid rgba(0, 113, 227, 0.15); padding: 24px; margin-bottom: 20px; }
 
-/* ── Forms ───────────────────────────────────────── */
-.form-section { margin: 20px 0 0; }
-.form-section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-3); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-.form-group .hint { font-size: 12px; color: var(--text-3); margin-top: 4px; }
-.form-group .error { font-size: 12px; color: var(--danger); margin-top: 4px; display: none; }
-.form-group.has-error input, .form-group.has-error select, .form-group.has-error textarea { border-color: var(--danger); }
+/* ── Forms (Atualizado para bordas visíveis) ──────── */
+.form-section { margin: 24px 0 0; }
+.form-section-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-3); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
+.form-group .hint { font-size: 13px; color: var(--text-2); margin-top: 6px; }
+.form-group .error { font-size: 13px; color: var(--danger); margin-top: 6px; display: none; font-weight: 500; }
+.form-group.has-error input, .form-group.has-error select, .form-group.has-error textarea { border-color: var(--danger); background: var(--danger-lt); }
 .form-group.has-error .error { display: block; }
+
 input, select, textarea {
-  width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-  font-size: 15px; font-family: var(--font); color: var(--text); background: var(--card);
-  transition: border-color var(--trans), box-shadow var(--trans); outline: none;
+  width: 100%; padding: 14px 16px; 
+  border: 1px solid var(--border); /* Borda visível adicionada */
+  border-radius: var(--radius-sm);
+  font-size: 15px; font-family: var(--font); color: var(--text); 
+  background: var(--card); /* Fundo branco garantido */
+  box-shadow: var(--shadow-sm); /* Sombra suave para dar profundidade */
+  transition: all var(--trans); outline: none;
   -webkit-appearance: none;
 }
 input::placeholder, textarea::placeholder { color: var(--text-3); }
-input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
-textarea { min-height: 90px; resize: vertical; }
+input:focus, select:focus, textarea:focus { 
+  border-color: var(--primary); 
+  box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); 
+}
+textarea { min-height: 100px; resize: vertical; }
 
 /* ── Tipo Toggle ─────────────────────────────────── */
-.tipo-toggle { display: flex; background: var(--gray-100); border-radius: 12px; padding: 4px; margin-bottom: 20px; gap: 4px; }
+.tipo-toggle { display: flex; background: var(--gray-200); border-radius: 14px; padding: 4px; margin-bottom: 24px; gap: 4px; border: 1px solid var(--border-light); }
 .tipo-btn {
-  flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer;
-  font-size: 14px; font-weight: 600; font-family: var(--font);
-  background: transparent; color: var(--text-2); transition: var(--trans);
+  flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer;
+  font-size: 14px; font-weight: 600; font-family: var(--font); letter-spacing: -0.01em;
+  background: transparent; color: var(--text-2); transition: all var(--trans);
 }
-.tipo-btn.active { background: var(--card); color: var(--primary); box-shadow: var(--shadow); }
+.tipo-btn.active { background: var(--card); color: var(--text); box-shadow: var(--shadow-sm); }
 
-/* ── Category grid ───────────────────────────────── */
-.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
+/* ── Category grid (Atualizado com bordas) ────────── */
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 8px; }
 .cat-btn {
-  border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 8px;
-  background: var(--card); cursor: pointer; text-align: center; transition: var(--trans);
+  border: 1px solid var(--border); /* Borda visível */
+  border-radius: var(--radius-sm); padding: 16px 8px;
+  background: var(--card); /* Fundo branco puro */
+  box-shadow: var(--shadow-sm); /* Sombra para delimitar o box */
+  cursor: pointer; text-align: center; transition: all var(--trans);
 }
-.cat-btn .cat-emoji { font-size: 22px; display: block; margin-bottom: 5px; }
-.cat-btn .cat-label { font-size: 11px; font-weight: 600; color: var(--text-2); }
-.cat-btn:hover { border-color: var(--primary); background: var(--primary-lt); }
-.cat-btn.selected { border-color: var(--primary); background: var(--primary-lt); }
-.cat-btn.selected .cat-label { color: var(--primary); }
+.cat-btn .cat-emoji { font-size: 24px; display: block; margin-bottom: 8px; transform: scale(1); transition: transform var(--trans); }
+.cat-btn .cat-label { font-size: 12px; font-weight: 500; color: var(--text-2); transition: color var(--trans); }
+.cat-btn:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.cat-btn:hover .cat-emoji { transform: scale(1.1); }
+.cat-btn.selected { background: var(--primary-lt); border-color: rgba(0, 113, 227, 0.3); box-shadow: none; }
+.cat-btn.selected .cat-label { color: var(--primary); font-weight: 600; }
 
-/* ── Prioridade Pills ─────────────────────────────── */
-.prio-row { display: flex; gap: 8px; }
+/* ── Prioridade Pills (Atualizado com bordas) ──────── */
+.prio-row { display: flex; gap: 10px; }
 .prio-btn {
-  flex: 1; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 8px;
-  background: var(--card); cursor: pointer; text-align: center; transition: var(--trans); font-family: var(--font);
+  flex: 1; 
+  border: 1px solid var(--border); /* Borda visível */
+  border-radius: var(--radius-sm); padding: 14px 8px;
+  background: var(--card); /* Fundo branco puro */
+  box-shadow: var(--shadow-sm); /* Sombra para delimitar o box */
+  cursor: pointer; text-align: center; transition: all var(--trans); font-family: var(--font);
 }
-.prio-btn span:first-child { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.prio-btn span:first-child { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; margin-bottom: 2px; color: var(--text); }
 .prio-btn span:last-child { font-size: 12px; color: var(--text-3); }
-.prio-btn.selected { border-color: var(--primary); background: var(--primary-lt); }
+.prio-btn:hover { background: var(--gray-50); border-color: var(--gray-300); }
+.prio-btn.selected { background: var(--primary-lt); border-color: rgba(0, 113, 227, 0.3); box-shadow: none; }
 .prio-btn.selected span:first-child { color: var(--primary); }
 
 /* ── Buttons ─────────────────────────────────────── */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  padding: 13px 24px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700;
-  font-family: var(--font); cursor: pointer; transition: var(--trans); border: none;
-  text-decoration: none; width: 100%;
+  padding: 16px 24px; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; letter-spacing: -0.01em;
+  font-family: var(--font); cursor: pointer; transition: all var(--trans); border: none;
+  text-decoration: none; width: 100%; outline: none;
 }
-.btn-primary { background: var(--primary); color: #fff; }
-.btn-primary:hover:not(:disabled) { background: var(--primary-dk); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,.35); }
-.btn-secondary { background: var(--card); color: var(--primary); border: 1.5px solid var(--border); }
-.btn-secondary:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-lt); }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(0, 113, 227, 0.25); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-dk); box-shadow: 0 6px 16px rgba(0, 113, 227, 0.35); }
+.btn-secondary { background: var(--card); color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-secondary:hover:not(:disabled) { background: var(--gray-50); border-color: var(--gray-300); }
 .btn-danger { background: var(--danger); color: #fff; }
-.btn:disabled { opacity: .55; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-.btn-sm { padding: 8px 16px; font-size: 13px; width: auto; }
-.btn-copy { background: var(--gray-100); color: var(--text-2); border: 1.5px solid var(--border); padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: var(--trans); display: inline-flex; align-items: center; gap: 6px; }
-.btn-copy:hover { background: var(--gray-200); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; filter: grayscale(1); }
+.btn-sm { padding: 10px 18px; font-size: 14px; width: auto; border-radius: var(--radius-xs); }
+.btn-copy { 
+  background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); 
+  padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 500; 
+  cursor: pointer; transition: all var(--trans); display: inline-flex; align-items: center; gap: 6px; 
+}
+.btn-copy:hover { background: rgba(255,255,255,0.2); }
+.btn-copy:active { transform: scale(0.95); }
 
 /* ── Badges / Status / SLA ───────────────────────── */
-.badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; }
-.badge-aberto      { background: #DBEAFE; color: #1D4ED8; }
-.badge-triagem     { background: #FEF3C7; color: #92400E; }
-.badge-execucao    { background: #EDE9FE; color: #5B21B6; }
-.badge-resolvido   { background: var(--success-lt); color: #065F46; }
-.badge-encerrado   { background: var(--gray-100); color: var(--gray-600); }
-.badge-alta        { background: #FEE2E2; color: #991B1B; }
-.badge-media       { background: #FEF3C7; color: #92400E; }
-.badge-baixa       { background: #DCFCE7; color: #14532D; }
-.sla-verde   { color: var(--success); font-weight: 700; font-size: 13px; }
-.sla-amarelo { color: var(--warn);    font-weight: 700; font-size: 13px; }
-.sla-vencido { color: var(--danger);  font-weight: 700; font-size: 13px; }
+.badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em; }
+.badge-aberto      { background: var(--primary-lt); color: var(--primary-dk); }
+.badge-triagem     { background: var(--warn-lt); color: #B25E02; }
+.badge-execucao    { background: #F3E8FF; color: #6B21A8; }
+.badge-resolvido   { background: var(--success-lt); color: #248A3D; }
+.badge-encerrado   { background: var(--gray-200); color: var(--gray-700); }
+.badge-alta        { background: var(--danger-lt); color: #C92A20; }
+.badge-media       { background: var(--warn-lt); color: #B25E02; }
+.badge-baixa       { background: var(--success-lt); color: #248A3D; }
+.sla-verde   { color: var(--success); font-weight: 600; font-size: 13px; }
+.sla-amarelo { color: var(--warn);    font-weight: 600; font-size: 13px; }
+.sla-vencido { color: var(--danger);  font-weight: 600; font-size: 13px; }
 
 /* ── Timeline ────────────────────────────────────── */
-.timeline { position: relative; }
-.tl-item { display: flex; gap: 14px; padding-bottom: 20px; position: relative; }
+.timeline { position: relative; padding-top: 8px; }
+.tl-item { display: flex; gap: 16px; padding-bottom: 24px; position: relative; }
 .tl-item:last-child { padding-bottom: 0; }
 .tl-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
-.tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gray-300, #D1D5DB); border: 2px solid var(--card); box-shadow: 0 0 0 2px var(--gray-400); margin-top: 4px; }
-.tl-dot.current { background: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
-.tl-line { width: 2px; background: var(--gray-200); flex: 1; min-height: 24px; margin: 4px 0; }
-.tl-body { flex: 1; }
-.tl-meta { font-size: 12px; color: var(--text-3); margin-bottom: 3px; }
-.tl-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-.tl-comment { background: var(--gray-50); border-left: 3px solid var(--border); padding: 8px 10px; border-radius: 0 6px 6px 0; font-size: 13px; color: var(--text-2); font-style: italic; margin-top: 5px; }
-.tl-resp { font-size: 12px; color: var(--text-3); margin-top: 3px; }
+.tl-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--gray-300); border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--border); margin-top: 4px; z-index: 2; transition: all var(--trans); }
+.tl-dot.current { background: var(--primary); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.2); border-color: var(--card); }
+.tl-line { width: 2px; background: var(--gray-200); flex: 1; min-height: 24px; margin: -4px 0; z-index: 1; }
+.tl-body { flex: 1; padding-top: 1px; }
+.tl-meta { font-size: 12px; color: var(--text-3); margin-bottom: 4px; font-weight: 500; }
+.tl-title { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; letter-spacing: -0.01em; }
+.tl-comment { background: var(--gray-50); border: 1px solid var(--border-light); padding: 12px 14px; border-radius: var(--radius-xs); font-size: 14px; color: var(--text-2); font-style: italic; margin-top: 8px; box-shadow: var(--shadow-sm); }
+.tl-resp { font-size: 12px; color: var(--text-3); margin-top: 6px; font-weight: 500; }
 
 /* ── Protocol Ticket ─────────────────────────────── */
 .protocol-ticket {
-  background: var(--gray-900); color: #fff; border-radius: var(--radius);
-  padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden;
+  background: var(--dark-bg); color: #fff; border-radius: var(--radius);
+  padding: 32px 24px; margin-bottom: 24px; position: relative; overflow: hidden;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15);
 }
 .protocol-ticket::after {
-  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 40px;
-  background: repeating-linear-gradient(to bottom, transparent, transparent 12px, rgba(255,255,255,.15) 12px, rgba(255,255,255,.15) 13px);
+  content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 60px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03));
 }
-.ticket-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #9CA3AF; margin-bottom: 8px; }
-.ticket-number { font-family: var(--mono); font-size: 26px; font-weight: 700; letter-spacing: 2px; margin-bottom: 16px; }
-.ticket-row { display: flex; justify-content: space-between; align-items: center; }
+.ticket-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--gray-500); margin-bottom: 12px; }
+.ticket-number { font-family: var(--mono); font-size: 28px; font-weight: 700; letter-spacing: 2px; margin-bottom: 24px; color: #fff; }
+.ticket-row { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; }
 .ticket-actions { display: flex; gap: 8px; }
 
 /* ── KV rows ─────────────────────────────────────── */
-.kv { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
+.kv { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--gray-100); }
 .kv:last-child { border-bottom: none; }
-.kv-label { font-size: 13px; color: var(--text-2); }
+.kv-label { font-size: 14px; color: var(--text-2); font-weight: 500; }
 .kv-value { font-size: 14px; font-weight: 600; color: var(--text); text-align: right; }
 
 /* ── Sidebar & Desk Layout ───────────────────────── */
-.sidebar { background: var(--gray-900); min-height: 100vh; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
-.sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,.08); }
-.sidebar-logo .logo-icon { font-size: 28px; margin-bottom: 4px; }
-.sidebar-logo .logo-name { font-size: 15px; font-weight: 700; color: #fff; }
-.sidebar-logo .logo-sub { font-size: 11px; color: #6B7280; }
-.sidebar-nav { padding: 12px 0; flex: 1; }
+.sidebar { background: var(--dark-bg); min-height: 100vh; display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto; border-right: 1px solid rgba(0,0,0,0.1); }
+.sidebar-logo { padding: 32px 24px 24px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.sidebar-logo .logo-icon { font-size: 32px; margin-bottom: 12px; }
+.sidebar-logo .logo-name { font-size: 17px; font-weight: 600; color: #fff; letter-spacing: -0.01em; }
+.sidebar-logo .logo-sub { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
+.sidebar-nav { padding: 24px 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
 .nav-item {
-  display: flex; align-items: center; gap: 12px; padding: 11px 20px;
-  color: #9CA3AF; text-decoration: none; font-size: 14px; font-weight: 500;
-  cursor: pointer; border: none; background: none; width: 100%;
-  transition: color var(--trans), background var(--trans);
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 10px;
+  color: var(--gray-400); text-decoration: none; font-size: 14px; font-weight: 500;
+  cursor: pointer; border: none; background: transparent; width: 100%;
+  transition: all var(--trans);
 }
-.nav-item:hover { color: #fff; background: rgba(255,255,255,.05); }
-.nav-item.active { color: #fff; background: rgba(37,99,235,.3); border-left: 3px solid var(--primary); }
+.nav-item:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.nav-item.active { color: #fff; background: var(--primary); font-weight: 600; box-shadow: 0 4px 12px rgba(0, 113, 227, 0.3); }
 .nav-item .nav-icon { font-size: 18px; width: 24px; text-align: center; }
-.sidebar-user { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); }
-.sidebar-user .user-name { font-size: 13px; font-weight: 600; color: #E5E7EB; }
-.sidebar-user .user-role { font-size: 11px; color: #6B7280; }
-.btn-logout { background: none; border: 1px solid rgba(255,255,255,.12); color: #9CA3AF; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; margin-top: 10px; width: 100%; transition: var(--trans); }
-.btn-logout:hover { color: #fff; border-color: rgba(255,255,255,.3); }
+.sidebar-user { padding: 24px; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2); }
+.sidebar-user .user-name { font-size: 14px; font-weight: 600; color: #fff; }
+.sidebar-user .user-role { font-size: 12px; color: var(--gray-500); margin-top: 2px; }
+.btn-logout { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--gray-300); padding: 8px 12px; border-radius: var(--radius-xs); font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 16px; width: 100%; transition: all var(--trans); }
+.btn-logout:hover { color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
 
 /* ── Desk Main ───────────────────────────────────── */
-.desk-main { display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; }
-.desk-topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 28px; display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
-.desk-topbar h1 { font-size: 18px; font-weight: 700; }
-.desk-topbar .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-.desk-content { padding: 28px; flex: 1; overflow-y: auto; }
+.desk-main { display: flex; flex-direction: column; min-height: 100vh; overflow: hidden; background: var(--bg); }
+.desk-topbar { 
+  background: rgba(255, 255, 255, 0.8); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border-light); padding: 20px 40px; display: flex; align-items: center; gap: 20px; flex-shrink: 0; z-index: 10;
+}
+.desk-topbar h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); }
+.desk-topbar .topbar-actions { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.desk-content { padding: 40px; flex: 1; overflow-y: auto; }
 
 /* ── Filter bar ─────────────────────────────────── */
-.filter-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
-.filter-label { font-size: 12px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .05em; margin-right: 4px; }
+.filter-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 24px; }
+.filter-label { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; margin-right: 8px; }
 .filter-chip {
-  padding: 6px 12px; border-radius: 99px; border: 1.5px solid var(--border);
+  padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
   background: var(--card); font-size: 13px; font-weight: 500; color: var(--text-2);
-  cursor: pointer; transition: var(--trans);
+  cursor: pointer; transition: all var(--trans); box-shadow: var(--shadow-sm);
 }
-.filter-chip:hover { border-color: var(--primary); color: var(--primary); }
-.filter-chip.active { border-color: var(--primary); background: var(--primary-lt); color: var(--primary); }
+.filter-chip:hover { border-color: var(--gray-400); color: var(--text); }
+.filter-chip.active { border-color: transparent; background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(0, 113, 227, 0.25); }
 
-/* ── List cards (T05) ────────────────────────────── */
-.request-list { display: flex; flex-direction: column; gap: 8px; }
-.request-item {
-  background: var(--card); border-radius: var(--radius-sm); border: 1.5px solid var(--border);
-  padding: 14px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer;
-  transition: var(--trans);
+/* ── Tabelas (Estrutura adicionada para a tela do Gestor) ── */
+.table-responsive { width: 100%; overflow-x: auto; background: var(--card); border-radius: var(--radius-sm); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table th { 
+  padding: 16px 24px; font-size: 12px; font-weight: 600; text-transform: uppercase; 
+  letter-spacing: 0.05em; color: var(--text-3); border-bottom: 1px solid var(--border); 
+  background: var(--gray-50); white-space: nowrap;
 }
-.request-item:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
-.request-item.vencido { border-left: 4px solid var(--danger); }
-.request-item .item-proto { font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--text); width: 140px; flex-shrink: 0; }
-.request-item .item-main { flex: 1; min-width: 0; }
-.request-item .item-cat { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
-.request-item .item-loc { font-size: 12px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.request-item .item-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-.request-item .item-sla { text-align: right; flex-shrink: 0; }
-.item-date { font-size: 12px; color: var(--text-3); margin-bottom: 4px; }
+.data-table td { 
+  padding: 20px 24px; font-size: 14px; border-bottom: 1px solid var(--border-light); 
+  color: var(--text); vertical-align: middle; 
+}
+.data-table tbody tr { transition: background var(--trans); cursor: pointer; }
+.data-table tbody tr:hover { background: var(--gray-50); }
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr.vencido-row td:first-child { border-left: 4px solid var(--danger); }
 
 /* ── Detail two-col ──────────────────────────────── */
-.detail-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+.detail-grid { display: grid; grid-template-columns: 1fr 400px; gap: 32px; align-items: start; }
 
 /* ── Search result ───────────────────────────────── */
-#consulta-resultado { display: none; }
-.status-hero { background: linear-gradient(135deg, #EFF6FF 0%, #F0FDF4 100%); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; border: 1.5px solid var(--border); }
+#consulta-resultado { display: none; animation: fadeIn 0.4s ease; }
+.status-hero { background: var(--card); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; border: 1px solid var(--border-light); box-shadow: var(--shadow); }
 
 /* ── Empty / Error states ────────────────────────── */
-.empty-state { text-align: center; padding: 48px 24px; color: var(--text-3); }
-.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
-.empty-state p { font-size: 16px; }
+.empty-state { text-align: center; padding: 60px 24px; color: var(--text-2); background: transparent; }
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 20px; opacity: 0.8; }
+.empty-state p { font-size: 16px; font-weight: 500; }
 
 /* ── Toast ───────────────────────────────────────── */
 #toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-  background: var(--gray-900); color: #fff; padding: 13px 20px; border-radius: var(--radius-sm);
-  font-size: 14px; font-weight: 500; z-index: 999; transition: transform .3s ease;
-  display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow-md); min-width: 280px;
-  pointer-events: none;
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(100px);
+  background: var(--dark-bg); color: #fff; padding: 16px 24px; border-radius: 30px;
+  font-size: 14px; font-weight: 500; z-index: 999; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); min-width: 300px;
+  pointer-events: none; opacity: 0;
 }
-#toast.show { transform: translateX(-50%) translateY(0); }
-#toast.toast-success { background: #065F46; }
-#toast.toast-error   { background: #7F1D1D; }
-#toast.toast-info    { background: #1E3A5F; }
+#toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+#toast.toast-success { background: var(--success); }
+#toast.toast-error   { background: var(--danger); }
+#toast.toast-info    { background: var(--dark-bg); }
 
 /* ── Loading overlay ─────────────────────────────── */
 #loading {
-  position: fixed; inset: 0; background: rgba(255,255,255,.7); z-index: 998;
-  display: none; align-items: center; justify-content: center; backdrop-filter: blur(2px);
+  position: fixed; inset: 0; background: rgba(245, 245, 247, 0.6); z-index: 998;
+  display: none; align-items: center; justify-content: center; 
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
 }
-#loading.show { display: flex; }
-.spinner { width: 42px; height: 42px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin .8s linear infinite; }
+#loading.show { display: flex; animation: fadeIn 0.3s ease; }
+.spinner { width: 48px; height: 48px; border: 4px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* ── T01: Seleção de Perfil ──────────────────────── */
 #screen-perfil {
-  background: linear-gradient(160deg, #EFF6FF 0%, #F0FDF4 50%, #F5F3FF 100%);
+  background: var(--bg);
   align-items: center; justify-content: center; flex-direction: column;
   padding: 40px 20px;
 }
-.perfil-header { text-align: center; margin-bottom: 40px; }
-.perfil-header .logo { font-size: 52px; margin-bottom: 12px; }
-.perfil-header h1 { font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 6px; letter-spacing: -.5px; }
-.perfil-header p { font-size: 16px; color: var(--text-2); max-width: 360px; line-height: 1.5; }
-.perfil-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 580px; width: 100%; }
+.perfil-header { text-align: center; margin-bottom: 60px; }
+.perfil-header .logo { font-size: 64px; margin-bottom: 20px; }
+.perfil-header h1 { font-size: 36px; font-weight: 700; color: var(--text); margin-bottom: 12px; letter-spacing: -0.02em; }
+.perfil-header p { font-size: 17px; color: var(--text-2); max-width: 420px; line-height: 1.5; margin: 0 auto; }
+.perfil-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 640px; width: 100%; }
 .perfil-card {
-  background: var(--card); border-radius: 20px; padding: 32px 24px; text-align: center;
-  cursor: pointer; transition: var(--trans); border: 2px solid transparent;
+  background: var(--card); border-radius: 24px; padding: 40px 32px; text-align: center;
+  cursor: pointer; transition: all var(--trans); border: 1px solid var(--border-light);
   box-shadow: var(--shadow);
 }
-.perfil-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-.perfil-card.cidadao:hover { border-color: var(--primary); }
-.perfil-card.atendente:hover { border-color: #6D28D9; }
-.perfil-card .pc-icon { font-size: 48px; margin-bottom: 16px; display: block; }
-.perfil-card h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-.perfil-card p { font-size: 13px; color: var(--text-2); margin-bottom: 20px; line-height: 1.5; }
+.perfil-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: rgba(0,0,0,0.1); }
+.perfil-card .pc-icon { font-size: 56px; margin-bottom: 24px; display: block; transition: transform var(--trans); }
+.perfil-card:hover .pc-icon { transform: scale(1.05); }
+.perfil-card h2 { font-size: 20px; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.01em; }
+.perfil-card p { font-size: 14px; color: var(--text-2); margin-bottom: 32px; line-height: 1.5; }
 .perfil-card .pc-btn {
-  display: block; padding: 11px 20px; border-radius: var(--radius-sm); font-weight: 700;
-  font-size: 14px; font-family: var(--font);
-  border: none; cursor: pointer; transition: var(--trans); width: 100%;
+  display: block; padding: 14px 24px; border-radius: var(--radius-sm); font-weight: 600;
+  font-size: 15px; font-family: var(--font); letter-spacing: -0.01em;
+  border: none; cursor: pointer; transition: all var(--trans); width: 100%; pointer-events: none;
 }
 .cidadao .pc-btn   { background: var(--primary); color: #fff; }
-.atendente .pc-btn { background: #6D28D9; color: #fff; }
-.perfil-footer { text-align: center; margin-top: 32px; font-size: 13px; color: var(--text-3); }
+.atendente .pc-btn { background: var(--dark-bg); color: #fff; }
+.perfil-footer { text-align: center; margin-top: 60px; font-size: 13px; color: var(--text-3); font-weight: 500; }
 
 /* ── T03: Confirmação extras ─────────────────────── */
-.confim-top { text-align: center; padding: 32px 0 20px; }
-.confirm-check { font-size: 56px; margin-bottom: 12px; display: block; }
-.confirm-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
-.confirm-sub { font-size: 15px; color: var(--text-2); }
-.anon-notice { background: var(--success-lt); border-radius: var(--radius-sm); padding: 12px 14px; border: 1px solid #A7F3D0; margin-bottom: 16px; font-size: 13px; color: #065F46; display: flex; gap: 8px; align-items: flex-start; }
+.confim-top { text-align: center; padding: 40px 0 32px; }
+.confirm-check { font-size: 64px; margin-bottom: 16px; display: block; animation: scaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes scaleUp { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.confirm-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.01em; }
+.confirm-sub { font-size: 16px; color: var(--text-2); }
+.anon-notice { background: var(--gray-50); border-radius: var(--radius-sm); padding: 16px; border: 1px solid var(--border); margin-bottom: 24px; font-size: 14px; color: var(--text-2); display: flex; gap: 12px; align-items: flex-start; }
 
 /* ── Search input container ──────────────────────── */
-.search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-.search-box input { flex: 1; font-family: var(--mono); text-transform: uppercase; font-size: 16px; letter-spacing: 1px; }
-.search-box .btn { width: auto; flex-shrink: 0; padding: 11px 20px; }
+.search-box { display: flex; gap: 12px; margin-bottom: 24px; background: var(--gray-100); padding: 8px; border-radius: 16px; border: 1px solid var(--border-light); transition: all var(--trans); }
+.search-box:focus-within { background: var(--card); border-color: var(--primary); box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.15); }
+.search-box input { flex: 1; font-family: var(--mono); text-transform: uppercase; font-size: 16px; letter-spacing: 1px; background: transparent; border: none; box-shadow: none; padding: 12px 16px; }
+.search-box input:focus { box-shadow: none; border: none; }
+.search-box .btn { width: auto; flex-shrink: 0; padding: 12px 24px; border-radius: 10px; }
 
 /* ── Update form card ────────────────────────────── */
-.update-card { background: var(--card); border-radius: var(--radius); border: 1.5px solid var(--border); padding: 24px; position: sticky; top: 80px; }
-.update-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 18px; }
-.response-codes { background: var(--gray-50); border-radius: 8px; padding: 12px; margin-top: 16px; }
-.response-codes p { font-size: 12px; color: var(--text-3); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; }
-.rc-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 13px; color: var(--text-2); }
-.rc-code { font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.update-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border-light); box-shadow: var(--shadow); padding: 32px; position: sticky; top: 100px; }
+.update-card h3 { font-size: 18px; font-weight: 600; margin-bottom: 24px; letter-spacing: -0.01em; }
+.response-codes { background: var(--gray-50); border-radius: var(--radius-sm); padding: 16px; margin-top: 24px; border: 1px solid var(--border); }
+.response-codes p { font-size: 12px; color: var(--text-3); margin-bottom: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.rc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; color: var(--text-2); font-weight: 500; }
+.rc-code { font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; }
 .rc-200 { background: var(--success-lt); color: var(--success); }
 .rc-400, .rc-422 { background: var(--warn-lt); color: var(--warn); }
 .rc-404 { background: var(--danger-lt); color: var(--danger); }
@@ -337,28 +401,24 @@ textarea { min-height: 90px; resize: vertical; }
 @media (max-width: 900px) {
   .screen.desk-screen.active { grid-template-columns: 1fr; }
   .sidebar { display: none; }
-  .detail-grid { grid-template-columns: 1fr; }
-  .update-card { position: static; margin-top: 20px; }
+  .detail-grid { grid-template-columns: 1fr; gap: 24px; }
+  .update-card { position: static; margin-top: 0; }
+  .desk-content { padding: 24px; }
+  .data-table th, .data-table td { padding: 12px 16px; }
 }
 @media (max-width: 520px) {
   .perfil-cards { grid-template-columns: 1fr; }
-  .perfil-header h1 { font-size: 22px; }
-  .request-item .item-proto { width: 110px; font-size: 11px; }
+  .perfil-header h1 { font-size: 28px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ────────────── LOADING ────────────── -->
 <div id="loading"><div class="spinner"></div></div>
 
-<!-- ────────────── TOAST ─────────────── -->
 <div id="toast"></div>
 
 
-<!-- ═══════════════════════════════════════════════
-     T01 — SELEÇÃO DE PERFIL
-═══════════════════════════════════════════════ -->
 <div id="screen-perfil" class="screen active">
   <div class="perfil-header">
     <div class="logo">🏛️</div>
@@ -367,11 +427,14 @@ textarea { min-height: 90px; resize: vertical; }
   </div>
 
   <div class="perfil-cards">
-    <div class="perfil-card cidadao" onclick="startCidadao()">
+    <div class="perfil-card cidadao">
       <span class="pc-icon">👤</span>
       <h2>Sou Cidadão</h2>
       <p>Registre uma solicitação ou consulte o andamento pelo protocolo</p>
-      <button class="pc-btn">Acessar</button>
+      <div style="display: flex; gap: 12px; justify-content: center; margin-top: 16px;">
+        <button class="pc-btn" onclick="startCidadao()" style="pointer-events: auto; width: 100%;">📝 Registrar</button>
+        <button class="pc-btn" onclick="showScreen('consultar')" style="pointer-events: auto; background: var(--card); color: var(--text); border: 1px solid var(--border); width: 100%;">🔍 Consultar</button>
+      </div>
     </div>
     <div class="perfil-card atendente" onclick="startAtendente()">
       <span class="pc-icon">👔</span>
@@ -387,20 +450,19 @@ textarea { min-height: 90px; resize: vertical; }
 </div>
 
 
-<!-- ═══════════════════════════════════════════════
-     T02 — REGISTRAR SOLICITAÇÃO
-     POST /api/cidadao/solicitacoes/{identificada|anonima}
-═══════════════════════════════════════════════ -->
 <div id="screen-registrar" class="screen">
   <div class="cit-header">
-    <div class="cit-header-inner">
-      <button class="back-btn" onclick="showScreen('perfil')">←</button>
-      <span class="header-logo-sm">🏛️</span>
-      <span class="header-title">Nova Solicitação</span>
+    <div class="cit-header-inner" style="justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <button class="back-btn" onclick="showScreen('perfil')">←</button>
+        <span class="header-logo-sm">🏛️</span>
+        <span class="header-title">Nova Solicitação</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('consultar')" style="padding: 6px 12px; font-size: 13px;">🔍 Consultar Protocolo</button>
     </div>
   </div>
 
-  <div class="citizen-wrap" style="padding-top:28px;">
+  <div class="citizen-wrap" style="padding-top:40px;">
     <div class="citizen-form">
 
       <div class="tipo-toggle">
@@ -412,7 +474,6 @@ textarea { min-height: 90px; resize: vertical; }
         </button>
       </div>
 
-      <!-- Campos Identificada -->
       <div id="campos-identificada">
         <div class="form-section">
           <div class="form-section-label">👤 Seus dados</div>
@@ -433,11 +494,10 @@ textarea { min-height: 90px; resize: vertical; }
         </div>
       </div>
 
-      <!-- Campos Anônima -->
       <div id="campos-anonima" style="display:none;">
-        <div class="card-accent" style="margin-bottom:16px;">
+        <div class="card-accent" style="margin-bottom:24px;">
           <strong>🔒 Modo anônimo ativado</strong>
-          <p style="font-size:13px;color:var(--text-2);margin-top:6px;">Nenhum dado pessoal será armazenado. A descrição deve ter mínimo de 20 caracteres.</p>
+          <p style="font-size:14px;color:var(--text-2);margin-top:8px;line-height:1.5;">Nenhum dado pessoal será armazenado. A descrição deve ter mínimo de 20 caracteres.</p>
         </div>
         <div class="form-group" id="fg-motivo">
           <label>Por que você prefere o anonimato? *</label>
@@ -446,7 +506,6 @@ textarea { min-height: 90px; resize: vertical; }
         </div>
       </div>
 
-      <!-- Campos Comuns -->
       <div class="form-section">
         <div class="form-section-label">📋 Sobre o problema</div>
 
@@ -493,7 +552,7 @@ textarea { min-height: 90px; resize: vertical; }
         </div>
       </div>
 
-      <button class="btn btn-primary" id="btn-registrar" onclick="submitRegistrar()" style="margin-top:8px;">
+      <button class="btn btn-primary" id="btn-registrar" onclick="submitRegistrar()" style="margin-top:16px;">
         📤 Enviar Solicitação
       </button>
     </div>
@@ -501,10 +560,6 @@ textarea { min-height: 90px; resize: vertical; }
 </div>
 
 
-<!-- ═══════════════════════════════════════════════
-     T03 — CONFIRMAÇÃO DE REGISTRO
-     Exibe response 201 do POST
-═══════════════════════════════════════════════ -->
 <div id="screen-confirmacao" class="screen">
   <div class="cit-header">
     <div class="cit-header-inner">
@@ -514,7 +569,7 @@ textarea { min-height: 90px; resize: vertical; }
     </div>
   </div>
 
-  <div class="citizen-wrap" style="padding-top:28px;">
+  <div class="citizen-wrap" style="padding-top:20px;">
     <div class="citizen-form">
       <div class="confim-top">
         <span class="confirm-check">✅</span>
@@ -526,14 +581,14 @@ textarea { min-height: 90px; resize: vertical; }
         <div class="ticket-label">🔑 Número do Protocolo — guarde este código</div>
         <div class="ticket-number" id="conf-protocolo">—</div>
         <div class="ticket-row">
-          <div style="font-size:12px;color:#9CA3AF;" id="conf-prazo"></div>
+          <div style="font-size:13px;color:var(--gray-500);font-weight:500;" id="conf-prazo"></div>
           <div class="ticket-actions">
             <button class="btn-copy" onclick="copyProtocolo()">📋 Copiar</button>
           </div>
         </div>
       </div>
 
-      <div class="card-flat" style="margin-bottom:16px;">
+      <div class="card-flat" style="margin-bottom:24px;">
         <div class="kv">
           <span class="kv-label">Prazo SLA</span>
           <span class="kv-value" id="conf-sla-prazo">—</span>
@@ -553,14 +608,14 @@ textarea { min-height: 90px; resize: vertical; }
       </div>
 
       <div id="conf-anon-notice" class="anon-notice" style="display:none;">
-        🔒 Nenhum dado pessoal foi armazenado nesta solicitação.
+        🔒 <strong>Atenção:</strong> Nenhum dado pessoal foi armazenado nesta solicitação.
       </div>
 
-      <p style="font-size:13px;font-weight:700;color:var(--danger);text-align:center;margin-bottom:16px;">
+      <p style="font-size:14px;font-weight:600;color:var(--danger);text-align:center;margin-bottom:24px;">
         ⚠️ Anote o protocolo agora — não será exibido novamente
       </p>
 
-      <button class="btn btn-primary" onclick="irParaConsultar()" style="margin-bottom:10px;">
+      <button class="btn btn-primary" onclick="irParaConsultar()" style="margin-bottom:12px;">
         🔍 Acompanhar Solicitação
       </button>
       <button class="btn btn-secondary" onclick="novaRegistrar()">
@@ -571,10 +626,6 @@ textarea { min-height: 90px; resize: vertical; }
 </div>
 
 
-<!-- ═══════════════════════════════════════════════
-     T04 — CONSULTAR SOLICITAÇÃO (CIDADÃO)
-     GET /api/cidadao/solicitacoes/{protocolo}
-═══════════════════════════════════════════════ -->
 <div id="screen-consultar" class="screen">
   <div class="cit-header">
     <div class="cit-header-inner">
@@ -584,38 +635,36 @@ textarea { min-height: 90px; resize: vertical; }
     </div>
   </div>
 
-  <div class="citizen-wrap" style="padding-top:28px;">
+  <div class="citizen-wrap" style="padding-top:40px;">
     <div class="citizen-form">
 
-      <div class="card" style="margin-bottom:8px;">
-        <p style="font-size:14px;color:var(--text-2);margin-bottom:14px;">
+      <div class="card" style="margin-bottom:16px;">
+        <p style="font-size:15px;color:var(--text-2);margin-bottom:20px;line-height:1.5;">
           Informe o número do protocolo recebido ao registrar sua solicitação.
         </p>
         <div class="search-box">
           <input id="input-protocolo" type="text" placeholder="OBS-2026-00001"
-                 style="text-transform:uppercase;letter-spacing:1px;font-family:var(--mono);font-size:16px;"
                  onkeydown="if(event.key==='Enter') consultarProtocolo()">
-          <button class="btn btn-primary" style="width:auto;flex-shrink:0;padding:11px 20px;" onclick="consultarProtocolo()">
+          <button class="btn btn-primary" onclick="consultarProtocolo()">
             🔍 Consultar
           </button>
         </div>
-        <p style="font-size:12px;color:var(--text-3);">Formato: OBS-AAAA-NNNNN (ex: OBS-2026-00001)</p>
+        <p style="font-size:13px;color:var(--text-3);font-weight:500;">Formato: OBS-AAAA-NNNNN (ex: OBS-2026-00001)</p>
       </div>
 
-      <!-- Resultado -->
       <div id="consulta-resultado">
         <div class="status-hero" id="res-hero">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;">
             <div>
-              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:4px;">Protocolo</div>
-              <div style="font-family:var(--mono);font-size:16px;font-weight:700;" id="res-proto">—</div>
+              <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);margin-bottom:6px;">Protocolo</div>
+              <div style="font-family:var(--mono);font-size:20px;font-weight:700;letter-spacing:-0.5px;" id="res-proto">—</div>
             </div>
             <span id="res-badge-status">—</span>
           </div>
-          <div id="res-progress" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px;"></div>
-          <div style="display:flex;gap:20px;">
-            <div><div style="font-size:11px;color:var(--text-3);">Prazo SLA</div><div style="font-size:14px;font-weight:700;" id="res-prazo">—</div></div>
-            <div><div style="font-size:11px;color:var(--text-3);">Indicador</div><div id="res-sla">—</div></div>
+          <div id="res-progress" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:24px;background:var(--gray-50);padding:12px;border-radius:12px;border:1px solid var(--border-light);"></div>
+          <div style="display:flex;gap:32px;">
+            <div><div style="font-size:12px;color:var(--text-3);font-weight:500;margin-bottom:4px;">Prazo SLA</div><div style="font-size:15px;font-weight:600;" id="res-prazo">—</div></div>
+            <div><div style="font-size:12px;color:var(--text-3);font-weight:500;margin-bottom:4px;">Indicador</div><div id="res-sla">—</div></div>
           </div>
         </div>
 
@@ -627,16 +676,16 @@ textarea { min-height: 90px; resize: vertical; }
         </div>
 
         <div class="card-flat">
-          <p style="font-size:13px;font-weight:700;margin-bottom:4px;">Descrição</p>
-          <p style="font-size:14px;color:var(--text-2);" id="res-desc">—</p>
+          <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);margin-bottom:12px;">Descrição</p>
+          <p style="font-size:15px;color:var(--text);line-height:1.6;" id="res-desc">—</p>
         </div>
 
         <div class="card-flat">
-          <p style="font-size:13px;font-weight:700;margin-bottom:16px;">🕐 Histórico de movimentações</p>
+          <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);margin-bottom:20px;">🕐 Histórico de movimentações</p>
           <div class="timeline" id="res-historico"></div>
         </div>
 
-        <button class="btn btn-secondary" onclick="limparConsulta()" style="margin-top:4px;">
+        <button class="btn btn-secondary" onclick="limparConsulta()" style="margin-top:12px;">
           🔍 Nova consulta
         </button>
       </div>
@@ -645,12 +694,7 @@ textarea { min-height: 90px; resize: vertical; }
 </div>
 
 
-<!-- ═══════════════════════════════════════════════
-     T05 — LISTA DE SOLICITAÇÕES (ATENDENTE)
-     GET /api/gestor/solicitacoes?status=&categoria=&prioridade=
-═══════════════════════════════════════════════ -->
 <div id="screen-lista" class="screen desk-screen">
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🏛️</div>
@@ -668,20 +712,18 @@ textarea { min-height: 90px; resize: vertical; }
     <div class="sidebar-user">
       <div class="user-name">👔 Atendente</div>
       <div class="user-role">Painel de Gestão</div>
-      <button class="btn-logout" onclick="showScreen('perfil')">Sair</button>
+      <button class="btn-logout" onclick="showScreen('perfil')">Sair da Sessão</button>
     </div>
   </aside>
 
-  <!-- Main -->
   <div class="desk-main">
     <div class="desk-topbar">
       <h1>📋 Solicitações</h1>
       <div class="topbar-actions">
-        <button class="btn btn-primary btn-sm" onclick="carregarLista()">🔄 Atualizar</button>
+        <button class="btn btn-secondary btn-sm" onclick="carregarLista()">🔄 Atualizar</button>
       </div>
     </div>
     <div class="desk-content">
-      <!-- Filtros -->
       <div class="filter-bar">
         <span class="filter-label">Status</span>
         <button class="filter-chip active" data-filter="status" data-value="" onclick="setFiltro('status','',this)">Todos</button>
@@ -697,7 +739,7 @@ textarea { min-height: 90px; resize: vertical; }
         <button class="filter-chip" data-filter="prioridade" data-value="ALTA" onclick="setFiltro('prioridade','ALTA',this)">🔴 Alta</button>
         <button class="filter-chip" data-filter="prioridade" data-value="MEDIA" onclick="setFiltro('prioridade','MEDIA',this)">🟡 Média</button>
         <button class="filter-chip" data-filter="prioridade" data-value="BAIXA" onclick="setFiltro('prioridade','BAIXA',this)">🟢 Baixa</button>
-        <span class="filter-label" style="margin-left:12px;">Categoria</span>
+        <span class="filter-label" style="margin-left:16px;">Categoria</span>
         <button class="filter-chip active" data-filter="categoria" data-value="" onclick="setFiltro('categoria','',this)">Todas</button>
         <button class="filter-chip" data-filter="categoria" data-value="ILUMINACAO" onclick="setFiltro('categoria','ILUMINACAO',this)">💡</button>
         <button class="filter-chip" data-filter="categoria" data-value="BURACO" onclick="setFiltro('categoria','BURACO',this)">🚧</button>
@@ -709,9 +751,21 @@ textarea { min-height: 90px; resize: vertical; }
       </div>
 
       <div id="lista-container">
-        <div class="empty-state">
-          <div class="empty-icon">📋</div>
-          <p>Carregando solicitações...</p>
+        <div class="table-responsive">
+          <table class="data-table" id="tabela-solicitacoes">
+            <thead>
+              <tr>
+                <th>Protocolo</th>
+                <th>Categoria</th>
+                <th>Abertura</th>
+                <th>Prioridade</th>
+                <th>Status</th>
+                <th style="text-align: right;">SLA</th>
+              </tr>
+            </thead>
+            <tbody id="lista-tbody">
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -719,13 +773,7 @@ textarea { min-height: 90px; resize: vertical; }
 </div>
 
 
-<!-- ═══════════════════════════════════════════════
-     T06 — DETALHE + ATUALIZAR STATUS (ATENDENTE)
-     GET  /api/gestor/solicitacoes/{protocolo}
-     PATCH /api/gestor/solicitacoes/{protocolo}/status
-═══════════════════════════════════════════════ -->
 <div id="screen-detalhe" class="screen desk-screen">
-  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-icon">🏛️</div>
@@ -743,28 +791,25 @@ textarea { min-height: 90px; resize: vertical; }
     <div class="sidebar-user">
       <div class="user-name">👔 Atendente</div>
       <div class="user-role">Painel de Gestão</div>
-      <button class="btn-logout" onclick="showScreen('perfil')">Sair</button>
+      <button class="btn-logout" onclick="showScreen('perfil')">Sair da Sessão</button>
     </div>
   </aside>
 
-  <!-- Main -->
   <div class="desk-main">
     <div class="desk-topbar">
-      <button class="btn btn-secondary btn-sm" onclick="showScreen('lista')" style="gap:4px;">← Voltar</button>
-      <h1 id="det-topbar-proto" style="font-family:var(--mono);font-size:16px;">—</h1>
-      <span id="det-topbar-badges" style="display:flex;gap:6px;align-items:center;"></span>
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('lista')" style="gap:6px;">← Voltar</button>
+      <h1 id="det-topbar-proto" style="font-family:var(--mono);font-size:18px;margin-left:8px;">—</h1>
+      <span id="det-topbar-badges" style="display:flex;gap:8px;align-items:center;"></span>
       <div class="topbar-actions">
         <button class="btn btn-secondary btn-sm" onclick="recarregarDetalhe()">🔄 Atualizar</button>
       </div>
     </div>
     <div class="desk-content">
       <div class="detail-grid">
-        <!-- Coluna esquerda: dados -->
         <div>
-          <!-- Status e dados gerais -->
-          <div class="card" style="margin-bottom:16px;">
-            <h3 style="font-size:14px;font-weight:700;color:var(--text-2);margin-bottom:14px;">📋 Dados da Solicitação</h3>
-            <div class="kv"><span class="kv-label">Protocolo</span><span class="kv-value" style="font-family:var(--mono);" id="det-protocolo">—</span></div>
+          <div class="card" style="margin-bottom:24px;">
+            <h3 style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:20px;letter-spacing:-0.01em;">📋 Dados da Solicitação</h3>
+            <div class="kv"><span class="kv-label">Protocolo</span><span class="kv-value" style="font-family:var(--mono);font-size:15px;" id="det-protocolo">—</span></div>
             <div class="kv"><span class="kv-label">Status</span><span class="kv-value" id="det-status">—</span></div>
             <div class="kv"><span class="kv-label">Categoria</span><span class="kv-value" id="det-categoria">—</span></div>
             <div class="kv"><span class="kv-label">Prioridade</span><span class="kv-value" id="det-prioridade">—</span></div>
@@ -774,31 +819,27 @@ textarea { min-height: 90px; resize: vertical; }
             <div class="kv"><span class="kv-label">📅 Abertura</span><span class="kv-value" id="det-abertura">—</span></div>
           </div>
 
-          <!-- Descrição -->
-          <div class="card-flat" style="margin-bottom:16px;">
-            <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:8px;">Descrição</p>
-            <p style="font-size:14px;color:var(--text-2);line-height:1.6;" id="det-desc">—</p>
+          <div class="card-flat" style="margin-bottom:24px;">
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);margin-bottom:12px;">Descrição</p>
+            <p style="font-size:15px;color:var(--text);line-height:1.6;" id="det-desc">—</p>
           </div>
 
-          <!-- Dados do cidadão (condicional) -->
-          <div id="det-cidadao-card" class="card-flat" style="margin-bottom:16px;display:none;">
-            <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:12px;">👤 Dados do Cidadão</p>
+          <div id="det-cidadao-card" class="card-flat" style="margin-bottom:24px;display:none;">
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);margin-bottom:16px;">👤 Dados do Cidadão</p>
             <div class="kv"><span class="kv-label">Nome</span><span class="kv-value" id="det-nome">—</span></div>
             <div class="kv"><span class="kv-label">E-mail</span><span class="kv-value" id="det-email">—</span></div>
             <div class="kv" id="det-tel-row"><span class="kv-label">Telefone</span><span class="kv-value" id="det-tel">—</span></div>
           </div>
-          <div id="det-anon-card" class="card-accent" style="margin-bottom:16px;display:none;">
-            🔒 <strong>Solicitação anônima</strong> — Nenhum dado pessoal foi armazenado.
+          <div id="det-anon-card" class="card-accent" style="margin-bottom:24px;display:none;">
+            🔒 <strong>Solicitação anônima</strong> <br><span style="font-size:14px;color:var(--text-2);margin-top:4px;display:block;">Nenhum dado pessoal foi armazenado.</span>
           </div>
 
-          <!-- Histórico -->
           <div class="card-flat">
-            <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:16px;">🕐 Histórico de movimentações</p>
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-3);margin-bottom:20px;">🕐 Histórico de movimentações</p>
             <div class="timeline" id="det-historico"></div>
           </div>
         </div>
 
-        <!-- Coluna direita: atualizar status -->
         <div>
           <div class="update-card">
             <h3>⚡ Atualizar Status</h3>
@@ -811,21 +852,21 @@ textarea { min-height: 90px; resize: vertical; }
               <div class="hint" id="hint-transicao">Fluxo: ABERTO → TRIAGEM → EM_EXECUCAO → RESOLVIDO → ENCERRADO</div>
             </div>
             <div class="form-group" id="fg-comentario">
-              <label>Comentário * <span style="font-weight:400;color:var(--text-3);font-size:12px;">(obrigatório)</span></label>
+              <label>Comentário * <span style="font-weight:400;color:var(--text-3);font-size:13px;">(obrigatório)</span></label>
               <textarea id="input-comentario" placeholder="Descreva a ação tomada..." rows="4"></textarea>
               <div class="error" id="err-comentario">Informe um comentário.</div>
             </div>
             <div class="form-group" id="fg-responsavel">
-              <label>Responsável * <span style="font-weight:400;color:var(--text-3);font-size:12px;">(obrigatório)</span></label>
+              <label>Responsável * <span style="font-weight:400;color:var(--text-3);font-size:13px;">(obrigatório)</span></label>
               <input id="input-responsavel" type="text" placeholder="Nome ou setor responsável">
               <div class="error" id="err-responsavel">Informe o responsável.</div>
             </div>
-            <button class="btn btn-primary" id="btn-atualizar" onclick="atualizarStatus()">
+            <button class="btn btn-primary" id="btn-atualizar" onclick="atualizarStatus()" style="margin-top:8px;">
               💾 Salvar Atualização
             </button>
 
-            <div class="response-codes" style="margin-top:16px;">
-              <p>Respostas possíveis</p>
+            <div class="response-codes" style="margin-top:24px;">
+              <p>Respostas da API</p>
               <div class="rc-row"><span class="rc-code rc-200">200</span> Atualizado com sucesso</div>
               <div class="rc-row"><span class="rc-code rc-400">400</span> Campo obrigatório ausente</div>
               <div class="rc-row"><span class="rc-code rc-404">404</span> Protocolo não encontrado</div>
@@ -838,10 +879,6 @@ textarea { min-height: 90px; resize: vertical; }
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════════════
-     JAVASCRIPT — State, API, Navigation, Handlers
-══════════════════════════════════════════════════ -->
 <script>
 'use strict';
 
@@ -875,7 +912,7 @@ const STATE = {
 };
 
 /* ── API Layer ──────────────────────────────────────── */
-const API_BASE = ''; // mesmo origin — Spring Boot serve /api/...
+const API_BASE = '';
 
 async function apiCall(method, path, body) {
   const opts = { method, headers:{'Content-Type':'application/json'} };
@@ -1081,7 +1118,6 @@ async function submitRegistrar() {
 }
 
 function novaRegistrar() {
-  // Limpar form
   ['f-nome','f-email','f-telefone','f-motivo','f-local','f-desc','f-anexo'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
@@ -1159,21 +1195,20 @@ function renderConsultaResult(data) {
   document.getElementById('res-loc').textContent = data.localizacao || '—';
   document.getElementById('res-abertura').textContent = formatDate(data.dataAbertura);
   document.getElementById('res-desc').textContent = data.descricao || '—';
-  // Progress indicator
+  
   const idx = STATUS_FLOW.indexOf(data.status);
   const progress = document.getElementById('res-progress');
   progress.innerHTML = STATUS_FLOW.map((s, i) => {
     const cfg = STATUS_CONFIG[s];
     const active = i <= idx;
-    return `<span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:${active ? 'var(--primary-lt)' : 'transparent'};color:${active ? 'var(--primary)' : 'var(--text-3)'};">${cfg.emoji} ${cfg.label}</span>`;
-  }).join('<span style="color:var(--text-3);font-size:11px;">›</span>');
+    return `<span style="font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px;background:${active ? 'var(--card)' : 'transparent'};color:${active ? 'var(--primary)' : 'var(--text-3)'};box-shadow:${active ? 'var(--shadow-sm)' : 'none'}; border: 1px solid ${active ? 'var(--border-light)' : 'transparent'}">${cfg.emoji} ${cfg.label}</span>`;
+  }).join('<span style="color:var(--gray-300);font-size:14px;font-weight:700;">›</span>');
   renderTimeline(data.historico || [], 'res-historico');
 }
 
-/* ── T05: Lista ─────────────────────────────────────── */
+/* ── T05: Lista (Refatorado para Tabela) ──────────────── */
 function setFiltro(tipo, valor, btn) {
   STATE.filtros[tipo] = valor;
-  // Deactivate siblings
   document.querySelectorAll(`.filter-chip[data-filter="${tipo}"]`).forEach(c => c.classList.remove('active'));
   btn.classList.add('active');
   carregarLista();
@@ -1192,40 +1227,45 @@ async function carregarLista() {
     const data = await api.get('/api/gestor/solicitacoes' + qs);
     renderLista(data);
   } catch (e) {
-    document.getElementById('lista-container').innerHTML =
-      `<div class="empty-state"><div class="empty-icon">❌</div><p>${e.message}</p></div>`;
+    const tbody = document.getElementById('lista-tbody');
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">❌</div><p>${e.message}</p></div></td></tr>`;
   } finally {
     showLoading(false);
   }
 }
 
 function renderLista(lista) {
-  const container = document.getElementById('lista-container');
+  const tbody = document.getElementById('lista-tbody');
+  
   if (!lista || lista.length === 0) {
-    container.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>Nenhuma solicitação encontrada com os filtros selecionados.</p></div>';
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">
+            <div class="empty-icon">📭</div>
+            <p>Nenhuma solicitação encontrada com os filtros selecionados.</p>
+          </div>
+        </td>
+      </tr>`;
     return;
   }
-  const html = lista.map(item => {
+  
+  tbody.innerHTML = lista.map(item => {
     const sla = SLA_CONFIG[item.indicadorSla] || { emoji:'?', label:'—', cls:'sla-vencido' };
     const vencido = item.indicadorSla === 'VENCIDO';
     return `
-      <div class="request-item ${vencido ? 'vencido' : ''}" onclick="abrirDetalhe('${item.protocolo}')">
-        <div class="item-proto">${item.protocolo}</div>
-        <div class="item-main">
-          <div class="item-cat">${CATEGORIA_LABEL[item.categoria] || item.categoria}</div>
-          <div class="item-date">📅 ${formatDate(item.dataAbertura)}</div>
-        </div>
-        <div class="item-badges">
-          ${badgeHtml(item.status)}
-          ${prioBadgeHtml(item.prioridade)}
-        </div>
-        <div class="item-sla">
+      <tr class="${vencido ? 'vencido-row' : ''}" onclick="abrirDetalhe('${item.protocolo}')">
+        <td style="font-family:var(--mono); font-weight:600; font-size:13px;">${item.protocolo}</td>
+        <td><span style="font-weight:600;">${CATEGORIA_LABEL[item.categoria] || item.categoria}</span></td>
+        <td style="color:var(--text-2);">📅 ${formatDateShort(item.dataAbertura)}</td>
+        <td>${prioBadgeHtml(item.prioridade)}</td>
+        <td>${badgeHtml(item.status)}</td>
+        <td style="text-align:right;">
           <div class="${sla.cls}" style="font-size:13px;">${sla.emoji} ${sla.label}</div>
-          ${vencido ? '<div style="font-size:11px;color:var(--danger);font-weight:700;">VENCIDO</div>' : ''}
-        </div>
-      </div>`;
+          ${vencido ? '<div style="font-size:11px;color:var(--danger);font-weight:700;margin-top:4px;">VENCIDO</div>' : ''}
+        </td>
+      </tr>`;
   }).join('');
-  container.innerHTML = `<div class="request-list">${html}</div><p style="margin-top:12px;font-size:13px;color:var(--text-3);text-align:right;">${lista.length} solicitação(ões)</p>`;
 }
 
 /* ── T06: Detalhe + Atualizar ────────────────────────── */
@@ -1252,10 +1292,8 @@ async function carregarDetalhe(protocolo) {
 }
 
 function renderDetalhe(data) {
-  // Topbar
   document.getElementById('det-topbar-proto').textContent = data.protocolo;
   document.getElementById('det-topbar-badges').innerHTML = badgeHtml(data.status) + ' ' + prioBadgeHtml(data.prioridade);
-  // KV fields
   document.getElementById('det-protocolo').textContent = data.protocolo;
   document.getElementById('det-status').innerHTML = badgeHtml(data.status);
   document.getElementById('det-categoria').textContent = CATEGORIA_LABEL[data.categoria] || data.categoria;
@@ -1265,7 +1303,7 @@ function renderDetalhe(data) {
   document.getElementById('det-local').textContent = data.localizacao || '—';
   document.getElementById('det-abertura').textContent = formatDate(data.dataAbertura);
   document.getElementById('det-desc').textContent = data.descricao || '—';
-  // Cidadão
+
   const cidadaoCard = document.getElementById('det-cidadao-card');
   const anonCard    = document.getElementById('det-anon-card');
   if (data.anonima) {
@@ -1284,11 +1322,10 @@ function renderDetalhe(data) {
       telRow.style.display = 'none';
     }
   }
-  // Timeline
+
   renderTimeline(data.historico || [], 'det-historico');
-  // Update form: populate valid transitions
   populateTransicoes(data.status);
-  // Clear form
+
   document.getElementById('input-comentario').value = '';
   document.getElementById('input-responsavel').value = '';
   ['fg-novo-status','fg-comentario','fg-responsavel'].forEach(clearError);

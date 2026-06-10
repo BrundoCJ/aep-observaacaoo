@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
-@Repository
+// @Repository — substituído por SolicitacaoRepositoryH2
 public class SolicitacaoRepositoryEmMemoria implements SolicitacaoRepository {
 
     private final Map<String, Solicitacao> dados = new ConcurrentHashMap<>();

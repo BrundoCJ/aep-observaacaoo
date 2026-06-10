@@ -1194,7 +1194,7 @@ async function consultarProtocolo() {
   try {
     const data = await api.get(`/api/cidadao/solicitacoes/${protocolo}`);
     renderConsultaResult(data);
-    document.getElementById('consulta-resultado').style.display = '';
+    document.getElementById('consulta-resultado').style.display = 'block';
   } catch (e) {
     // Erro inline — persiste na tela até o usuário fazer nova busca
     const errEl = document.getElementById('consulta-error');

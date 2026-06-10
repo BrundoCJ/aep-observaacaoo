@@ -149,7 +149,7 @@ Cada `Solicitacao` mantém uma lista imutável de `Movimentacao`, registrando o 
 | Linguagem | Java 17 | LTS estável, records, sealed classes |
 | Framework | Spring Boot 3 | Convenção sobre configuração, ecossistema maduro |
 | API | Spring Web (REST) | Exposição via HTTP/JSON |
-| Persistência | Em memória — `ConcurrentHashMap` | Sem banco de dados; repositório substituível via interface |
+| Persistência | H2 Database (arquivo) + Spring Data JPA | Dados persistentes entre reinicializações; schema gerado automaticamente |
 | Build | Maven (Maven Wrapper) | Reprodutibilidade sem instalação prévia |
 | Controle de versão | Git + GitHub | — |
 
@@ -197,7 +197,10 @@ cd aep-observaacao
 mvnw.cmd spring-boot:run      # Windows
 ```
 
-Acesse `http://localhost:8080/` para abrir o frontend, ou `http://localhost:8080/api/gestor/solicitacoes` para confirmar que a API está no ar.
+Acesse `http://localhost:8080/` para abrir o frontend
+
+> **Console H2** (visualizar o banco): `http://localhost:8080/h2-console`  
+> JDBC URL: `jdbc:h2:file:./data/observaacao` · Usuário: `sa` · Senha: _(vazia)_, ou `http://localhost:8080/api/gestor/solicitacoes` para confirmar que a API está no ar.
 
 ---
 
@@ -325,5 +328,5 @@ servido diretamente pelo Spring Boot como recurso estático.
 - ✅ Migração para Spring Boot (controller / service / repository / DTOs)
 - ✅ Wireframes das telas essenciais (IHC) — 6 telas mapeadas aos endpoints da API
 - ✅ Frontend completo integrado — `src/main/resources/static/index.html`
-- ⬜ Persistência em arquivo ou banco de dados
+- ✅ Persistência em banco H2 (arquivo) — dados sobrevivem ao restart
 - ⬜ Relatório de métricas (SonarQube / Checkstyle / PMD)

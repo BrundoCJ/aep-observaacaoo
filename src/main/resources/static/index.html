@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ObservaAção — Ouvidoria Cidadã Digital</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
 <style>
 /* ── Reset & Tokens ────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -645,11 +646,21 @@ textarea { min-height: 100px; resize: vertical; }
         <div class="search-box">
           <input id="input-protocolo" type="text" placeholder="OBS-2026-00001"
                  onkeydown="if(event.key==='Enter') consultarProtocolo()">
-          <button class="btn btn-primary" onclick="consultarProtocolo()">
+          <button class="btn btn-primary" id="btn-consultar" onclick="consultarProtocolo()">
             🔍 Consultar
           </button>
         </div>
         <p style="font-size:13px;color:var(--text-3);font-weight:500;">Formato: OBS-AAAA-NNNNN (ex: OBS-2026-00001)</p>
+      </div>
+
+      <!-- Estado de erro inline — persiste até nova consulta -->
+      <div id="consulta-error" style="display:none;animation:fadeIn 0.3s ease;">
+        <div class="card-flat" style="text-align:center;padding:40px 24px;">
+          <div style="font-size:52px;margin-bottom:16px;">🔍</div>
+          <p style="font-size:17px;font-weight:600;color:var(--danger);margin-bottom:8px;">Protocolo não encontrado</p>
+          <p id="consulta-error-msg" style="font-size:14px;color:var(--text-2);margin-bottom:24px;line-height:1.5;"></p>
+          <p style="font-size:13px;color:var(--text-3);">Verifique o número e tente novamente. O formato correto é <strong>OBS-AAAA-NNNNN</strong>.</p>
+        </div>
       </div>
 
       <div id="consulta-resultado">
@@ -1163,7 +1174,9 @@ function irParaConsultar() {
 /* ── T04: Consultar ──────────────────────────────────── */
 function limparConsulta() {
   document.getElementById('consulta-resultado').style.display = 'none';
+  document.getElementById('consulta-error').style.display = 'none';
   document.getElementById('input-protocolo').value = '';
+  document.getElementById('input-protocolo').focus();
 }
 
 async function consultarProtocolo() {
@@ -1172,16 +1185,26 @@ async function consultarProtocolo() {
   if (!protocolo) { toast('⚠️ Informe o número do protocolo.', 'error'); return; }
   input.value = protocolo;
 
-  showLoading(true);
+  // Ocultar estados anteriores
   document.getElementById('consulta-resultado').style.display = 'none';
+  document.getElementById('consulta-error').style.display = 'none';
+
+  setButtonLoading('btn-consultar', true);
+  showLoading(true);
   try {
     const data = await api.get(`/api/cidadao/solicitacoes/${protocolo}`);
     renderConsultaResult(data);
     document.getElementById('consulta-resultado').style.display = '';
   } catch (e) {
+    // Erro inline — persiste na tela até o usuário fazer nova busca
+    const errEl = document.getElementById('consulta-error');
+    const msgEl = document.getElementById('consulta-error-msg');
+    if (msgEl) msgEl.textContent = e.message;
+    errEl.style.display = '';
     toast('❌ ' + e.message, 'error');
   } finally {
     showLoading(false);
+    setButtonLoading('btn-consultar', false);
   }
 }
 

@@ -329,4 +329,4 @@ servido diretamente pelo Spring Boot como recurso estático.
 - ✅ Wireframes das telas essenciais (IHC) — 6 telas mapeadas aos endpoints da API
 - ✅ Frontend completo integrado — `src/main/resources/static/index.html`
 - ✅ Persistência em banco H2 (arquivo) — dados sobrevivem ao restart
-- ⬜ Relatório de métricas (SonarQube / Checkstyle / PMD)
+- ✅ Relatório de métricas (SonarCloud)

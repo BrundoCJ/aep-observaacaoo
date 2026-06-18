@@ -2,6 +2,9 @@
 target/
 *.class
 
+# H2 database files (local dev only)
+data/
+
 # Maven wrapper cache (baixado automaticamente)
 .m2/
 

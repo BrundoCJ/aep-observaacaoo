@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: aep-observaacao
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    envVars:
+      - key: JAVA_TOOL_OPTIONS
+        value: -Xmx350m

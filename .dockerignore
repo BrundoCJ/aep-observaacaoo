@@ -1,0 +1,7 @@
+target/
+data/
+.idea/
+.vscode/
+.git/
+.claude/
+*.iml
